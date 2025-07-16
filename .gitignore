@@ -87,3 +87,6 @@ phpunit.xml
 # Local configuration
 /config/local/
 local-config.php
+
+# MCP configuration with secrets
+.mcp.json
