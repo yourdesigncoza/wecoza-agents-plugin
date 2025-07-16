@@ -1,0 +1,42 @@
+/**
+ * WeCoza Agents Plugin - Extracted Styles
+ * 
+ * Minimal CSS extracted from theme for agent functionality.
+ * These styles were originally in ydcoza-styles.css
+ */
+
+/* Agent Absent Category Badge - Light Theme */
+.note-category-agent-absent {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-color: #93c5fd;
+}
+
+/* Agent Absent Category Badge - Dark Theme */
+html[data-bs-theme="dark"] .note-category-agent-absent {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+    border-color: #3730a3;
+}
+
+/* Recommended: Replace inline styles with these classes */
+.wecoza-agents-fixed-table-container {
+    padding-bottom: 0px;
+}
+
+.wecoza-agents-fixed-table-header {
+    display: none;
+}
+
+.wecoza-agents-fixed-table-loading {
+    top: 1px;
+}
+
+.wecoza-agents-accordion-flush {
+    margin: 0 -11px;
+}
+
+.wecoza-agents-update-button {
+    background-color: #6e5dc6;
+    color: white;
+}
