@@ -90,3 +90,5 @@ local-config.php
 
 # MCP configuration with secrets
 .mcp.json
+
+.claude
