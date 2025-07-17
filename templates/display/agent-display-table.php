@@ -78,33 +78,18 @@
                   <div class="col-12">
                      <div class="scrollbar">
                         <div class="row g-0 flex-nowrap">
-                           <div class="col-auto pe-4">
+                           <?php foreach ($statistics as $stat_key => $stat_data) : ?>
+                           <div class="col-auto <?php echo $stat_key === 'total_agents' ? 'pe-4' : 'px-4'; ?>">
                               <h6 class="text-body-tertiary">
-                                 Total Classes : 39 
-                                 <div class="badge badge-phoenix fs-10 badge-phoenix-success">+ 11</div>
+                                 <?php echo esc_html($stat_data['label']); ?> : <?php echo esc_html($stat_data['count']); ?>
+                                 <?php if (!empty($stat_data['badge'])) : ?>
+                                 <div class="badge badge-phoenix fs-10 badge-phoenix-<?php echo esc_attr($stat_data['badge_type']); ?>">
+                                    <?php echo esc_html($stat_data['badge']); ?>
+                                 </div>
+                                 <?php endif; ?>
                               </h6>
                            </div>
-                           <div class="col-auto px-4">
-                              <h6 class="text-body-tertiary">Active Classes : 36</h6>
-                           </div>
-                           <div class="col-auto px-4">
-                              <h6 class="text-body-tertiary">
-                                 SETA Funded : 37 
-                                 <div class="badge badge-phoenix fs-10 badge-phoenix-success">+ 5</div>
-                              </h6>
-                           </div>
-                           <div class="col-auto px-4">
-                              <h6 class="text-body-tertiary">
-                                 Exam Classes : 32 
-                                 <div class="badge badge-phoenix fs-10 badge-phoenix-danger">+ 8</div>
-                              </h6>
-                           </div>
-                           <div class="col-auto px-4">
-                              <h6 class="text-body-tertiary">
-                                 Unique Clients : 12 
-                                 <div class="badge badge-phoenix fs-10 badge-phoenix-success">- 2</div>
-                              </h6>
-                           </div>
+                           <?php endforeach; ?>
                         </div>
                      </div>
                   </div>
@@ -120,12 +105,80 @@
                                     <?php if ($atts['show_filters']) : ?>
                                     <a href="<?php echo esc_url($this->get_sort_url($col_key)); ?>">
                                     <?php echo esc_html($col_label); ?>
+                                    <?php 
+                                    // Add appropriate icon based on column type
+                                    $icon_class = '';
+                                    switch($col_key) {
+                                        case 'first_name':
+                                            $icon_class = 'bi bi-person';
+                                            break;
+                                        case 'initials':
+                                            $icon_class = 'bi bi-type-underline';
+                                            break;
+                                        case 'last_name':
+                                            $icon_class = 'bi bi-person-badge';
+                                            break;
+                                        case 'gender':
+                                            $icon_class = 'bi bi-gender-ambiguous';
+                                            break;
+                                        case 'race':
+                                            $icon_class = 'bi bi-people';
+                                            break;
+                                        case 'phone':
+                                            $icon_class = 'bi bi-telephone';
+                                            break;
+                                        case 'email':
+                                            $icon_class = 'bi bi-envelope';
+                                            break;
+                                        case 'city':
+                                            $icon_class = 'bi bi-geo-alt';
+                                            break;
+                                        default:
+                                            $icon_class = 'bi bi-list-ul';
+                                            break;
+                                    }
+                                    ?>
+                                    <i class="<?php echo esc_attr($icon_class); ?> ms-1"></i>
                                     <?php if ($sort_column === $col_key) : ?>
                                     <i class="bi bi-arrow-<?php echo ($sort_order === 'ASC') ? 'up' : 'down'; ?>"></i>
                                     <?php endif; ?>
                                     </a>
                                     <?php else : ?>
                                     <?php echo esc_html($col_label); ?>
+                                    <?php 
+                                    // Add appropriate icon based on column type
+                                    $icon_class = '';
+                                    switch($col_key) {
+                                        case 'first_name':
+                                            $icon_class = 'bi bi-person';
+                                            break;
+                                        case 'initials':
+                                            $icon_class = 'bi bi-type-underline';
+                                            break;
+                                        case 'last_name':
+                                            $icon_class = 'bi bi-person-badge';
+                                            break;
+                                        case 'gender':
+                                            $icon_class = 'bi bi-gender-ambiguous';
+                                            break;
+                                        case 'race':
+                                            $icon_class = 'bi bi-people';
+                                            break;
+                                        case 'phone':
+                                            $icon_class = 'bi bi-telephone';
+                                            break;
+                                        case 'email':
+                                            $icon_class = 'bi bi-envelope';
+                                            break;
+                                        case 'city':
+                                            $icon_class = 'bi bi-geo-alt';
+                                            break;
+                                        default:
+                                            $icon_class = 'bi bi-list-ul';
+                                            break;
+                                    }
+                                    ?>
+                                    <i class="<?php echo esc_attr($icon_class); ?> ms-1"></i>
                                     <?php endif; ?>
                                  </div>
                                  <div class="fht-cell"></div>
@@ -133,7 +186,10 @@
                               <?php endforeach; ?>
                               <?php if ($atts['show_actions']) : ?>
                               <th class="text-nowrap text-center ydcoza-width-150" data-field="actions">
-                                 <div class="th-inner"><?php esc_html_e('Actions', 'wecoza-agents-plugin'); ?></div>
+                                 <div class="th-inner">
+                                    <?php esc_html_e('Actions', 'wecoza-agents-plugin'); ?>
+                                    <i class="bi bi-gear ms-1"></i>
+                                 </div>
                                  <div class="fht-cell"></div>
                               </th>
                               <?php endif; ?>
@@ -158,23 +214,38 @@
                               </td>
                               <?php endforeach; ?>
                               <?php if ($atts['show_actions']) : ?>
-                              <td class="text-nowrap text-center ydcoza-width-150">
-                                 <div class="btn-group btn-group-sm" role="group">
-                                    <button class="btn btn-subtle-secondary view-agent-details" 
-                                       data-bs-toggle="modal" 
-                                       data-bs-target="#agentModal"
-                                       data-agent-id="<?php echo esc_attr($agent['id']); ?>">
-                                    <?php esc_html_e('View', 'wecoza-agents-plugin'); ?>
+                              <td class="text-center">
+                                 <div class="dropdown">
+                                    <button class="btn btn-link text-body btn-sm dropdown-toggle" style="text-decoration: none;" type="button" id="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                       <i class="bi bi-three-dots"></i>
                                     </button>
-                                    <?php if ($can_manage) : ?>
-                                    <a href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>" class="btn btn-subtle-secondary">
-                                    <?php esc_html_e('Edit', 'wecoza-agents-plugin'); ?>
-                                    </a>
-                                    <button class="btn btn-subtle-danger delete-agent-btn" 
-                                       data-id="<?php echo esc_attr($agent['id']); ?>">
-                                    <?php esc_html_e('Delete', 'wecoza-agents-plugin'); ?>
-                                    </button>
-                                    <?php endif; ?>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>">
+                                       <li>
+                                          <button class="dropdown-item view-agent-details" 
+                                             data-bs-toggle="modal" 
+                                             data-bs-target="#agentModal"
+                                             data-agent-id="<?php echo esc_attr($agent['id']); ?>">
+                                             <?php esc_html_e('View Details', 'wecoza-agents-plugin'); ?>
+                                             <i class="bi bi-eye ms-2"></i>
+                                          </button>
+                                       </li>
+                                       <?php if ($can_manage) : ?>
+                                       <li>
+                                          <a class="dropdown-item" href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>">
+                                             <?php esc_html_e('Edit Agent', 'wecoza-agents-plugin'); ?>
+                                             <i class="bi bi-pencil ms-2"></i>
+                                          </a>
+                                       </li>
+                                       <li><hr class="dropdown-divider"></li>
+                                       <li>
+                                          <button class="dropdown-item text-danger delete-agent-btn" 
+                                             data-id="<?php echo esc_attr($agent['id']); ?>">
+                                             <?php esc_html_e('Delete Agent', 'wecoza-agents-plugin'); ?>
+                                             <i class="bi bi-trash ms-2"></i>
+                                          </button>
+                                       </li>
+                                       <?php endif; ?>
+                                    </ul>
                                  </div>
                               </td>
                               <?php endif; ?>

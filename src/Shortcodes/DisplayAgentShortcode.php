@@ -93,8 +93,20 @@ class DisplayAgentShortcode extends AbstractShortcode {
     protected function enqueue_assets() {
         parent::enqueue_assets();
         
+        // Use minified versions unless in debug mode
+        $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
+        
         // Additional assets for display table
         wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.1.3', true);
+        
+        // Table search functionality
+        wp_enqueue_script(
+            'wecoza-agents-table-search',
+            WECOZA_AGENTS_JS_URL . 'agents-table-search' . $suffix . '.js',
+            array('jquery', 'wecoza-agents'),
+            WECOZA_AGENTS_VERSION,
+            true
+        );
     }
 
     /**
@@ -129,6 +141,9 @@ class DisplayAgentShortcode extends AbstractShortcode {
         // Determine columns to display
         $columns = $this->get_display_columns($atts['columns']);
         
+        // Get agent statistics
+        $statistics = $this->get_agent_statistics();
+        
         // Display the table
         $this->load_template('agent-display-table.php', array(
             'agents' => $agents,
@@ -144,6 +159,7 @@ class DisplayAgentShortcode extends AbstractShortcode {
             'columns' => $columns,
             'atts' => $atts,
             'can_manage' => $this->can_manage_agents(),
+            'statistics' => $statistics,
         ), 'display');
         
         // Load modal template if actions are enabled
@@ -213,6 +229,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0123456789',
                 'email' => 'peter.w@example.com',
                 'city' => 'Cape Town',
+                'status' => 'active',
+                'sace_number' => 'SACE123456',
+                'quantum_maths_passed' => true,
+                'quantum_science_passed' => true,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 2,
@@ -224,6 +245,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0987654321',
                 'email' => 'sarah.j@example.com',
                 'city' => 'Johannesburg',
+                'status' => 'active',
+                'sace_number' => 'SACE789012',
+                'quantum_maths_passed' => false,
+                'quantum_science_passed' => true,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 3,
@@ -235,6 +261,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0212223344',
                 'email' => 'david.s@example.com',
                 'city' => 'Durban',
+                'status' => 'active',
+                'sace_number' => '',
+                'quantum_maths_passed' => true,
+                'quantum_science_passed' => false,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 4,
@@ -246,6 +277,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0334455667',
                 'email' => 'maria.g@example.com',
                 'city' => 'Pretoria',
+                'status' => 'active',
+                'sace_number' => 'SACE345678',
+                'quantum_maths_passed' => true,
+                'quantum_science_passed' => true,
+                'signed_agreement' => false,
             ),
             array(
                 'id' => 5,
@@ -257,6 +293,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0112233445',
                 'email' => 'john.d@example.com',
                 'city' => 'Bloemfontein',
+                'status' => 'inactive',
+                'sace_number' => 'SACE567890',
+                'quantum_maths_passed' => false,
+                'quantum_science_passed' => false,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 6,
@@ -268,6 +309,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0445566778',
                 'email' => 'emily.d@example.com',
                 'city' => 'Port Elizabeth',
+                'status' => 'active',
+                'sace_number' => 'SACE678901',
+                'quantum_maths_passed' => false,
+                'quantum_science_passed' => true,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 7,
@@ -279,6 +325,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0556677889',
                 'email' => 'michael.b@example.com',
                 'city' => 'East London',
+                'status' => 'active',
+                'sace_number' => '',
+                'quantum_maths_passed' => true,
+                'quantum_science_passed' => false,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 8,
@@ -290,6 +341,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0667788990',
                 'email' => 'linda.t@example.com',
                 'city' => 'Kimberley',
+                'status' => 'active',
+                'sace_number' => 'SACE890123',
+                'quantum_maths_passed' => true,
+                'quantum_science_passed' => true,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 9,
@@ -301,6 +357,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0778899001',
                 'email' => 'robert.w@example.com',
                 'city' => 'Polokwane',
+                'status' => 'active',
+                'sace_number' => 'SACE901234',
+                'quantum_maths_passed' => false,
+                'quantum_science_passed' => false,
+                'signed_agreement' => true,
             ),
             array(
                 'id' => 10,
@@ -312,6 +373,11 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'phone' => '0889900112',
                 'email' => 'jessica.l@example.com',
                 'city' => 'Nelspruit',
+                'status' => 'active',
+                'sace_number' => 'SACE012345',
+                'quantum_maths_passed' => true,
+                'quantum_science_passed' => false,
+                'signed_agreement' => true,
             ),
         );
     }
@@ -431,5 +497,65 @@ class DisplayAgentShortcode extends AbstractShortcode {
         $capture_page_url = home_url('/agent-capture/');
         
         return add_query_arg('agent_id', $agent_id, $capture_page_url);
+    }
+
+    /**
+     * Get agent statistics for display
+     *
+     * @since 1.0.0
+     * @return array Agent statistics with counts and badges
+     */
+    private function get_agent_statistics() {
+        $all_agents = $this->get_hardcoded_agents();
+        
+        // Calculate statistics
+        $total_agents = count($all_agents);
+        $active_agents = count(array_filter($all_agents, function($agent) {
+            return isset($agent['status']) && $agent['status'] === 'active';
+        }));
+        $sace_registered = count(array_filter($all_agents, function($agent) {
+            return !empty($agent['sace_number']);
+        }));
+        $quantum_qualified = count(array_filter($all_agents, function($agent) {
+            return (isset($agent['quantum_maths_passed']) && $agent['quantum_maths_passed']) ||
+                   (isset($agent['quantum_science_passed']) && $agent['quantum_science_passed']);
+        }));
+        $agreement_signed = count(array_filter($all_agents, function($agent) {
+            return isset($agent['signed_agreement']) && $agent['signed_agreement'];
+        }));
+        
+        // Return statistics with demo badges
+        return array(
+            'total_agents' => array(
+                'label' => __('Total Agents', 'wecoza-agents-plugin'),
+                'count' => $total_agents,
+                'badge' => '+3',
+                'badge_type' => 'success'
+            ),
+            'active_agents' => array(
+                'label' => __('Active Agents', 'wecoza-agents-plugin'),
+                'count' => $active_agents,
+                'badge' => null,
+                'badge_type' => null
+            ),
+            'sace_registered' => array(
+                'label' => __('SACE Registered', 'wecoza-agents-plugin'),
+                'count' => $sace_registered,
+                'badge' => '+2',
+                'badge_type' => 'success'
+            ),
+            'quantum_qualified' => array(
+                'label' => __('Quantum Qualified', 'wecoza-agents-plugin'),
+                'count' => $quantum_qualified,
+                'badge' => '+1',
+                'badge_type' => 'warning'
+            ),
+            'agreement_signed' => array(
+                'label' => __('Agreement Signed', 'wecoza-agents-plugin'),
+                'count' => $agreement_signed,
+                'badge' => '+4',
+                'badge_type' => 'success'
+            )
+        );
     }
 }
