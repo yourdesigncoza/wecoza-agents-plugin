@@ -500,6 +500,35 @@ class DisplayAgentShortcode extends AbstractShortcode {
     }
 
     /**
+     * Get view URL for single agent
+     *
+     * @since 1.0.0
+     * @param int $agent_id Agent ID
+     * @return string View URL
+     */
+    public function get_view_url($agent_id) {
+        // Sub-task 3.1: Add get_view_url($agent_id) method
+        // Sub-task 3.2: Implement get_view_url() to return URL to single agent page
+        // Sub-task 3.3: Use home_url() or get_permalink() to generate proper WordPress URLs
+        
+        // Try to get the single agent page URL from settings first
+        // In production, this would be stored in plugin settings
+        $single_agent_page_id = get_option('wecoza_agents_single_page_id', 0);
+        
+        if ($single_agent_page_id && get_post_status($single_agent_page_id) === 'publish') {
+            // Use the configured page
+            $base_url = get_permalink($single_agent_page_id);
+        } else {
+            // Fallback to a default path
+            // This assumes a page with slug 'agent-view' exists
+            $base_url = home_url('/app/agent-view/');
+        }
+        
+        // Add agent_id as query parameter
+        return add_query_arg('agent_id', $agent_id, $base_url);
+    }
+
+    /**
      * Get agent statistics for display
      *
      * @since 1.0.0

@@ -209,6 +209,11 @@ class Plugin {
             require_once WECOZA_AGENTS_SRC_DIR . 'Shortcodes/DisplayAgentShortcode.php';
             $this->components['display_shortcode'] = new \WeCoza\Agents\Shortcodes\DisplayAgentShortcode();
         }
+        
+        if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Shortcodes/SingleAgentShortcode.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Shortcodes/SingleAgentShortcode.php';
+            $this->components['single_agent_shortcode'] = new \WeCoza\Agents\Shortcodes\SingleAgentShortcode();
+        }
     }
 
     /**

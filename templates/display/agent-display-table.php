@@ -221,13 +221,17 @@
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>">
                                        <li>
-                                          <button class="dropdown-item view-agent-details" 
-                                             data-bs-toggle="modal" 
-                                             data-bs-target="#agentModal"
-                                             data-agent-id="<?php echo esc_attr($agent['id']); ?>">
+                                          <?php 
+                                          // Sub-task 3.4: Locate View Details button
+                                          // Sub-task 3.5: Remove modal attributes
+                                          // Sub-task 3.6: Change button to anchor tag
+                                          // Sub-task 3.7: Update to use get_view_url() method
+                                          ?>
+                                          <a class="dropdown-item view-agent-details" 
+                                             href="<?php echo esc_url($this->get_view_url($agent['id'])); ?>">
                                              <?php esc_html_e('View Details', 'wecoza-agents-plugin'); ?>
                                              <i class="bi bi-eye ms-2"></i>
-                                          </button>
+                                          </a>
                                        </li>
                                        <?php if ($can_manage) : ?>
                                        <li>
