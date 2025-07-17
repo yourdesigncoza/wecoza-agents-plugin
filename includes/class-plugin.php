@@ -176,10 +176,16 @@ class Plugin {
      */
     private function load_database_classes() {
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Database/DatabaseService.php')) {
-            $this->components['database'] = new \WeCoza\Agents\Database\DatabaseService();
+            // Load DatabaseLogger first if it exists (dependency of DatabaseService)
+            if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Database/DatabaseLogger.php')) {
+                require_once WECOZA_AGENTS_SRC_DIR . 'Database/DatabaseLogger.php';
+            }
+            require_once WECOZA_AGENTS_SRC_DIR . 'Database/DatabaseService.php';
+            $this->components['database'] = \WeCoza\Agents\Database\DatabaseService::getInstance();
         }
         
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Database/AgentQueries.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Database/AgentQueries.php';
             $this->components['agent_queries'] = new \WeCoza\Agents\Database\AgentQueries();
         }
     }
@@ -190,11 +196,18 @@ class Plugin {
      * @since 1.0.0
      */
     private function load_shortcode_classes() {
+        // Load AbstractShortcode first (base class)
+        if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Shortcodes/AbstractShortcode.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Shortcodes/AbstractShortcode.php';
+        }
+        
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Shortcodes/CaptureAgentShortcode.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Shortcodes/CaptureAgentShortcode.php';
             $this->components['capture_shortcode'] = new \WeCoza\Agents\Shortcodes\CaptureAgentShortcode();
         }
         
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Shortcodes/DisplayAgentShortcode.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Shortcodes/DisplayAgentShortcode.php';
             $this->components['display_shortcode'] = new \WeCoza\Agents\Shortcodes\DisplayAgentShortcode();
         }
     }
@@ -206,14 +219,17 @@ class Plugin {
      */
     private function load_helper_classes() {
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Helpers/ValidationHelper.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Helpers/ValidationHelper.php';
             $this->components['validation_helper'] = new \WeCoza\Agents\Helpers\ValidationHelper();
         }
         
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Helpers/ArrayHelper.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Helpers/ArrayHelper.php';
             $this->components['array_helper'] = new \WeCoza\Agents\Helpers\ArrayHelper();
         }
         
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Helpers/StringHelper.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Helpers/StringHelper.php';
             $this->components['string_helper'] = new \WeCoza\Agents\Helpers\StringHelper();
         }
     }
@@ -225,10 +241,12 @@ class Plugin {
      */
     private function load_form_classes() {
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Forms/AgentCaptureForm.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Forms/AgentCaptureForm.php';
             $this->components['capture_form'] = new \WeCoza\Agents\Forms\AgentCaptureForm();
         }
         
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Forms/FormValidator.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Forms/FormValidator.php';
             $this->components['form_validator'] = new \WeCoza\Agents\Forms\FormValidator();
         }
     }
@@ -240,6 +258,7 @@ class Plugin {
      */
     private function load_model_classes() {
         if (file_exists(WECOZA_AGENTS_SRC_DIR . 'Models/Agent.php')) {
+            require_once WECOZA_AGENTS_SRC_DIR . 'Models/Agent.php';
             $this->components['agent_model'] = new \WeCoza\Agents\Models\Agent();
         }
     }
@@ -250,20 +269,8 @@ class Plugin {
      * @since 1.0.0
      */
     private function set_locale() {
-        add_action('plugins_loaded', array($this, 'load_plugin_textdomain'));
-    }
-
-    /**
-     * Load the plugin text domain
-     *
-     * @since 1.0.0
-     */
-    public function load_plugin_textdomain() {
-        load_plugin_textdomain(
-            $this->text_domain,
-            false,
-            dirname(plugin_basename(WECOZA_AGENTS_PLUGIN_FILE)) . '/languages/'
-        );
+        // Textdomain loading is now handled in main plugin file
+        // to ensure it loads before any translation functions are called
     }
 
     /**
@@ -323,6 +330,59 @@ class Plugin {
     public function init() {
         // Initialize components that need WordPress to be loaded
         do_action('wecoza_agents_init');
+        
+        // Check for Bootstrap availability
+        $this->check_bootstrap_availability();
+    }
+
+    /**
+     * Check if Bootstrap 5 is available
+     *
+     * @since 1.0.0
+     */
+    private function check_bootstrap_availability() {
+        add_action('wp_enqueue_scripts', array($this, 'bootstrap_check_callback'), 999);
+    }
+
+    /**
+     * Bootstrap check callback
+     *
+     * @since 1.0.0
+     */
+    public function bootstrap_check_callback() {
+        if (!is_admin()) {
+            return;
+        }
+        
+        global $wp_styles;
+        $bootstrap_found = false;
+        
+        if (isset($wp_styles->registered)) {
+            foreach ($wp_styles->registered as $handle => $style) {
+                if (strpos($handle, 'bootstrap') !== false || 
+                    (isset($style->src) && strpos($style->src, 'bootstrap') !== false)) {
+                    $bootstrap_found = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$bootstrap_found) {
+            add_action('admin_notices', array($this, 'bootstrap_admin_notice'));
+        }
+    }
+
+    /**
+     * Bootstrap admin notice
+     *
+     * @since 1.0.0
+     */
+    public function bootstrap_admin_notice() {
+        ?>
+        <div class="notice notice-warning">
+            <p><?php echo esc_html__('WeCoza Agents Plugin: Bootstrap 5 CSS framework not detected. The plugin requires Bootstrap 5 for proper styling.', 'wecoza-agents-plugin'); ?></p>
+        </div>
+        <?php
     }
 
     /**

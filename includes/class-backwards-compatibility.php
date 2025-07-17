@@ -148,9 +148,12 @@ class BackwardsCompatibility {
      */
     private function create_fallback_function($function_name, $callback) {
         if (!function_exists($function_name)) {
+            // Store callback in global to avoid circular reference issues with var_export
+            $GLOBALS['wecoza_agents_callbacks'][$function_name] = $callback;
+            
             eval("function $function_name() {
                 \$args = func_get_args();
-                return call_user_func_array(" . var_export($callback, true) . ", \$args);
+                return call_user_func_array(\$GLOBALS['wecoza_agents_callbacks']['$function_name'], \$args);
             }");
         }
     }
@@ -230,7 +233,9 @@ class BackwardsCompatibility {
      * @since 1.0.0
      */
     public function load_agents_files_fallback() {
-        _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin auto-loads all files');
+        if (function_exists('_deprecated_function')) {
+            _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin auto-loads all files');
+        }
         
         // Log the deprecated function call
         if (WP_DEBUG) {
@@ -247,7 +252,9 @@ class BackwardsCompatibility {
      * @since 1.0.0
      */
     public function enqueue_agents_assets_fallback() {
-        _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin handles asset loading automatically');
+        if (function_exists('_deprecated_function')) {
+            _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin handles asset loading automatically');
+        }
         
         // Log the deprecated function call
         if (WP_DEBUG) {
@@ -266,7 +273,9 @@ class BackwardsCompatibility {
      * @return string
      */
     public function agents_capture_shortcode_fallback($atts = array()) {
-        _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin [wecoza_capture_agents] shortcode');
+        if (function_exists('_deprecated_function')) {
+            _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin [wecoza_capture_agents] shortcode');
+        }
         
         // Log the deprecated function call
         if (WP_DEBUG) {
@@ -285,7 +294,9 @@ class BackwardsCompatibility {
      * @return string
      */
     public function wecoza_display_agents_shortcode_fallback($atts = array()) {
-        _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin [wecoza_display_agents] shortcode');
+        if (function_exists('_deprecated_function')) {
+            _deprecated_function(__FUNCTION__, '1.0.0', 'WeCoza Agents Plugin [wecoza_display_agents] shortcode');
+        }
         
         // Log the deprecated function call
         if (WP_DEBUG) {
@@ -534,5 +545,7 @@ class BackwardsCompatibility {
     }
 }
 
-// Initialize backwards compatibility
-BackwardsCompatibility::get_instance();
+// Initialize backwards compatibility after init
+add_action('init', function() {
+    BackwardsCompatibility::get_instance();
+}, 5);

@@ -47,7 +47,7 @@ function wecoza_agents_check_requirements() {
     // Check PHP version
     if (version_compare(PHP_VERSION, WECOZA_AGENTS_MIN_PHP_VERSION, '<')) {
         $errors[] = sprintf(
-            __('WeCoza Agents Plugin requires PHP %s or higher. You are running PHP %s.', 'wecoza-agents-plugin'),
+            'WeCoza Agents Plugin requires PHP %s or higher. You are running PHP %s.',
             WECOZA_AGENTS_MIN_PHP_VERSION,
             PHP_VERSION
         );
@@ -57,37 +57,13 @@ function wecoza_agents_check_requirements() {
     global $wp_version;
     if (version_compare($wp_version, WECOZA_AGENTS_MIN_WP_VERSION, '<')) {
         $errors[] = sprintf(
-            __('WeCoza Agents Plugin requires WordPress %s or higher. You are running WordPress %s.', 'wecoza-agents-plugin'),
+            'WeCoza Agents Plugin requires WordPress %s or higher. You are running WordPress %s.',
             WECOZA_AGENTS_MIN_WP_VERSION,
             $wp_version
         );
     }
 
-    // Check if Bootstrap 5 is available (parent theme dependency)
-    add_action('wp_enqueue_scripts', function() use (&$errors) {
-        global $wp_styles;
-        $bootstrap_found = false;
-        
-        if (isset($wp_styles->registered)) {
-            foreach ($wp_styles->registered as $handle => $style) {
-                if (strpos($handle, 'bootstrap') !== false || 
-                    (isset($style->src) && strpos($style->src, 'bootstrap') !== false)) {
-                    $bootstrap_found = true;
-                    break;
-                }
-            }
-        }
-        
-        if (!$bootstrap_found && is_admin()) {
-            add_action('admin_notices', function() {
-                ?>
-                <div class="notice notice-warning">
-                    <p><?php _e('WeCoza Agents Plugin: Bootstrap 5 CSS framework not detected. The plugin requires Bootstrap 5 for proper styling.', 'wecoza-agents-plugin'); ?></p>
-                </div>
-                <?php
-            });
-        }
-    }, 999);
+    // Bootstrap check is moved to later in the initialization process
 
     return $errors;
 }
@@ -101,7 +77,7 @@ function wecoza_agents_requirements_notice() {
     if (!empty($errors)) {
         ?>
         <div class="notice notice-error">
-            <p><strong><?php _e('WeCoza Agents Plugin cannot be activated:', 'wecoza-agents-plugin'); ?></strong></p>
+            <p><strong><?php echo esc_html('WeCoza Agents Plugin cannot be activated:'); ?></strong></p>
             <ul>
                 <?php foreach ($errors as $error) : ?>
                     <li><?php echo esc_html($error); ?></li>
@@ -128,15 +104,17 @@ function wecoza_agents_load_textdomain() {
     load_plugin_textdomain(
         'wecoza-agents-plugin',
         false,
-        dirname(plugin_basename(__FILE__)) . '/languages'
+        dirname(plugin_basename(__FILE__)) . '/languages/'
     );
 }
-add_action('plugins_loaded', 'wecoza_agents_load_textdomain');
 
 /**
  * Initialize the plugin
  */
 function wecoza_agents_init() {
+    // Load textdomain first
+    wecoza_agents_load_textdomain();
+    
     // Check requirements
     $errors = wecoza_agents_check_requirements();
     if (!empty($errors)) {
@@ -148,6 +126,10 @@ function wecoza_agents_init() {
         require_once WECOZA_AGENTS_PLUGIN_DIR . 'vendor/autoload.php';
     }
 
+    // Load and define constants
+    require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-constants.php';
+    \WeCoza\Agents\Includes\Constants::define_constants();
+
     // Load core plugin files
     require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-plugin.php';
 
@@ -155,7 +137,7 @@ function wecoza_agents_init() {
     $plugin = \WeCoza\Agents\Plugin::get_instance();
     $plugin->run();
 }
-add_action('plugins_loaded', 'wecoza_agents_init', 20);
+add_action('init', 'wecoza_agents_init', 1);
 
 /**
  * Activation hook
@@ -166,7 +148,7 @@ function wecoza_agents_activate() {
     if (!empty($errors)) {
         wp_die(
             implode('<br>', $errors),
-            __('Plugin Activation Error', 'wecoza-agents-plugin'),
+            'Plugin Activation Error',
             array('back_link' => true)
         );
     }
@@ -196,7 +178,7 @@ register_deactivation_hook(__FILE__, 'wecoza_agents_deactivate');
  */
 function wecoza_agents_plugin_action_links($links) {
     $action_links = array(
-        '<a href="' . admin_url('admin.php?page=wecoza-agents-settings') . '">' . __('Settings', 'wecoza-agents-plugin') . '</a>',
+        '<a href="' . admin_url('admin.php?page=wecoza-agents-settings') . '">Settings</a>',
     );
     
     return array_merge($action_links, $links);
@@ -209,8 +191,8 @@ add_filter('plugin_action_links_' . WECOZA_AGENTS_PLUGIN_BASENAME, 'wecoza_agent
 function wecoza_agents_plugin_meta_links($links, $file) {
     if ($file === WECOZA_AGENTS_PLUGIN_BASENAME) {
         $meta_links = array(
-            '<a href="https://wecoza.co.za/docs/agents-plugin" target="_blank">' . __('Documentation', 'wecoza-agents-plugin') . '</a>',
-            '<a href="https://wecoza.co.za/support" target="_blank">' . __('Support', 'wecoza-agents-plugin') . '</a>',
+            '<a href="https://wecoza.co.za/docs/agents-plugin" target="_blank">Documentation</a>',
+            '<a href="https://wecoza.co.za/support" target="_blank">Support</a>',
         );
         
         return array_merge($links, $meta_links);

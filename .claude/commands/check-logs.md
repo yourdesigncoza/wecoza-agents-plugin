@@ -1,10 +1,10 @@
 # Manage WordPress Logs
 
-Analyze and manage the WordPress debug log and WeCoza plugin console based on the requested action.
+Analyze "Think Hard" and manage the WordPress debug log and WeCoza plugin console based on the requested action.
 
 ## Target files:
 - Debug log: `/opt/lampp/htdocs/wecoza/wp-content/debug.log`
-- Console log: `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-classes-plugin/console.txt`
+- Console log: `/opt/lampp/htdocs/wecoza/wp-content/plugins/wecoza-agents-plugin/console.txt`
 
 ## Action requested: $ARGUMENTS
 
@@ -17,10 +17,6 @@ Based on the arguments provided, perform one of these actions:
 4. Show the 5 most recent critical errors
 5. Identify recurring error patterns
 6. Provide fix suggestions
-
-### If "clear" or "clean":
-1. Clear the log files (truncate to 0 bytes)
-2. Confirm the operation was successful
 
 ### If "backup":
 1. Create timestamped backups of both logs
@@ -45,3 +41,12 @@ Always provide a summary at the end with:
 - Current status of both log files
 - Number of issues found (if checking)
 - Recommended next steps
+
+## Auto-clear after analysis:
+After completing the log analysis (when action is "check" or no arguments), automatically clear the debug log to keep it clean for future debugging:
+
+```bash
+# Clear debug log after analysis
+> /opt/lampp/htdocs/wecoza/wp-content/debug.log
+echo "Debug log cleared after analysis"
+```
