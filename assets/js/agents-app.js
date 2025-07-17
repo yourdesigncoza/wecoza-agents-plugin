@@ -214,26 +214,4 @@ jQuery(document).ready(function($) {
             // Optionally, initialize on page load (in case the checkbox is pre-checked)
             toggleSignedAgreementFields();
 
-
-
-          // Initialize Select2 on your <select> by ID
-            $( '#preferred_working_area_1' ).select2( {
-                width: '100%',
-                placeholder: $( this ).data( 'placeholder' ),
-                closeOnSelect: true,
-                allowClear: true,
-            } );
-            $( '#preferred_working_area_2' ).select2( {
-                width: '100%',
-                placeholder: $( this ).data( 'placeholder' ),
-                closeOnSelect: true,
-                allowClear: true,
-            } );
-            $( '#preferred_working_area_3' ).select2( {
-                width: '100%',
-                placeholder: $( this ).data( 'placeholder' ),
-                closeOnSelect: true,
-                allowClear: true,
-            } );
-
 }) // jQuery(document).ready(function($) {

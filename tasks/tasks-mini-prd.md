@@ -1,61 +1,57 @@
-# Tasks: Replace Select2 with Bootstrap 5 Native Dropdowns
-
-Based on the PRD document `mini-prd.md`, this task list guides the implementation of replacing Select2 library with native Bootstrap 5 dropdown functionality.
+# Tasks: WeCoza Agents Plugin - Table Styling Standardization
 
 ## Relevant Files
 
-- `includes/class-plugin.php` - Main plugin class that enqueues Select2 CSS/JS (lines 604-610, 624-631, 637)
-- `src/Shortcodes/CaptureAgentShortcode.php` - Controller that enqueues Select2 for capture form (lines 82-96, 102, 108)
-- `includes/class-backwards-compatibility.php` - Backwards compatibility handler with Select2 dependency (line 204)
-- `assets/js/agent-form-validation.js` - Form validation script with Select2 initialization (lines 24-31)
-- `assets/js/agents-app.js` - Main application script with Select2 initialization (lines 219-237)
-- `templates/forms/agent-capture-form.php` - Form template (already Bootstrap 5 compatible, no changes needed)
-- `CLAUDE.md` - Documentation file that references Select2 usage
+- `templates/display/agent-display-table.php` - Main table template that needs Phoenix styling updates
+- `design-guide.md` - Reference document containing Phoenix design system patterns
+- `mini-prd.md` - Product requirements document for this feature
+- `/opt/lampp/htdocs/wecoza/wp-content/themes/wecoza_3_child_theme/includes/css/ydcoza-styles.css` - Custom CSS file for additional styling (if needed)
+- `assets/css/agents-extracted.css` - Plugin-specific CSS file for agents styling
 
 ### Notes
 
-- Templates already use Bootstrap 5 classes (`form-select form-select-sm`) - no template changes required
-- Focus on removing code rather than adding - avoid code bloat
-- Test functionality thoroughly after each removal to ensure no regressions
-- MVC principle: Controllers handle script enqueuing, Views (templates) remain unchanged
+- Phoenix theme CSS is already loaded via `ydcoza-theme.css`, so minimal custom CSS should be needed
+- Bootstrap 5 is already available and should be leveraged for responsive design
+- All existing table functionality (search, pagination, actions) must remain intact
+- Focus on using existing Bootstrap 5 and Phoenix classes rather than custom CSS
 
 ## Tasks
 
-- [ ] 1.0 Remove Select2 Dependencies from PHP Files
-  - [x] 1.1 Remove Select2 CSS enqueue from `includes/class-plugin.php` (lines 604-610)
-  - [x] 1.2 Remove Select2 JS enqueue from `includes/class-plugin.php` (lines 624-631)
-  - [x] 1.3 Remove 'select2' dependency from main script in `includes/class-plugin.php` (line 637)
-  - [x] 1.4 Remove Select2 CSS enqueue from `src/Shortcodes/CaptureAgentShortcode.php` (lines 82-88)
-  - [x] 1.5 Remove Select2 JS enqueue from `src/Shortcodes/CaptureAgentShortcode.php` (lines 90-96)
-  - [x] 1.6 Remove 'select2' dependency from form validation script in `src/Shortcodes/CaptureAgentShortcode.php` (lines 102, 108)
-  - [x] 1.7 Remove 'select2' dependency from `includes/class-backwards-compatibility.php` (line 204)
+- [x] 1.0 Update Table Structure and Classes
+  - [x] 1.1 Locate main table element in `templates/display/agent-display-table.php` at line 110
+  - [x] 1.2 Replace current table classes `table table-bordered ydcoza-compact-table table-hover borderless-table`
+  - [x] 1.3 Apply Phoenix standard classes: `table table-hover table-sm fs-9 mb-0`
+  - [x] 1.4 Verify table-responsive wrapper is maintained for mobile compatibility
+  - [x] 1.5 Test table rendering after class changes to ensure no layout breaks
 
-- [ ] 2.0 Update JavaScript Files to Remove Select2 Initialization
-  - [ ] 2.1 Remove Select2 initialization code from `assets/js/agent-form-validation.js` (lines 24-31)
-  - [ ] 2.2 Remove conditional Select2 check `if ($.fn.select2)` from `assets/js/agent-form-validation.js`
-  - [ ] 2.3 Remove Select2 initialization for individual dropdowns from `assets/js/agents-app.js` (lines 219-237)
-  - [ ] 2.4 Remove Select2 configuration objects from `assets/js/agents-app.js`
-  - [ ] 2.5 Verify no other JavaScript files reference Select2 functionality
+- [x] 2.0 Standardize Table Headers with Phoenix Design System
+  - [x] 2.1 Add `border-bottom` class to `<thead>` element (line 111)
+  - [x] 2.2 Add `border-end` class to table header `<th>` elements for column separation
+  - [x] 2.3 Ensure header elements have `sort` class for sortable columns
+  - [x] 2.4 Verify header styling matches Phoenix design guide patterns
+  - [x] 2.5 Test header sorting functionality remains intact
 
-- [ ] 3.0 Verify Template Compatibility with Bootstrap 5 Native Selects
-  - [ ] 3.1 Confirm `templates/forms/agent-capture-form.php` uses `form-select form-select-sm` classes
-  - [ ] 3.2 Verify working area dropdowns (lines 241-268) have proper Bootstrap 5 markup
-  - [ ] 3.3 Ensure placeholder options are properly formatted (`<option value="">Select</option>`)
-  - [ ] 3.4 Confirm no template changes are required (avoid unnecessary modifications)
+- [x] 3.0 Implement Phoenix Action Button Styling
+  - [x] 3.1 Locate action button section in template (lines 160-176)
+  - [x] 3.2 Update View button: replace `btn bg-discovery-subtle` with `btn btn-sm btn-subtle-secondary`
+  - [x] 3.3 Update Edit button: replace `btn bg-warning-subtle` with `btn btn-sm btn-subtle-secondary`
+  - [x] 3.4 Update Delete button: replace `btn bg-danger-subtle` with `btn btn-sm btn-subtle-danger`
+  - [x] 3.5 Ensure button group wrapper maintains `btn-group btn-group-sm` classes
+  - [x] 3.6 Test all button functionality (view modal, edit navigation, delete action)
 
-- [ ] 4.0 Test and Validate Functionality
-  - [ ] 4.1 Test dropdown selection functionality in preferred working areas
-  - [ ] 4.2 Verify form submission processes correctly with native selects
-  - [ ] 4.3 Test form validation behavior with Bootstrap 5 native selects
-  - [ ] 4.4 Ensure no JavaScript console errors occur
-  - [ ] 4.5 Test responsive design functionality on mobile devices
-  - [ ] 4.6 Verify accessibility features work with native selects
-  - [ ] 4.7 Test across major browsers (Chrome, Firefox, Safari, Edge)
+- [x] 4.0 Apply Consistent Typography and Text Colors
+  - [x] 4.1 Add `text-body` class to table cell `<td>` elements for primary content
+  - [x] 4.2 Update email links to use `text-primary` class for better visibility
+  - [x] 4.3 Update phone number links to use `text-primary` class
+  - [x] 4.4 Apply `text-muted` class to "No agents found" message
+  - [x] 4.5 Verify text hierarchy follows Phoenix design system standards
+  - [x] 4.6 Test text readability across light and dark themes
 
-- [ ] 5.0 Performance Testing and Documentation Updates
-  - [ ] 5.1 Measure page load time improvement after Select2 removal
-  - [ ] 5.2 Verify reduction in HTTP requests (should be 2 fewer)
-  - [ ] 5.3 Confirm no JavaScript errors in browser console
-  - [ ] 5.4 Update `CLAUDE.md` to remove Select2 references (line 75)
-  - [ ] 5.5 Update any other documentation mentioning Select2 usage
-  - [ ] 5.6 Verify plugin activation/deactivation works correctly
+- [x] 5.0 Verify Responsive Design and Cross-Browser Compatibility
+  - [x] 5.1 Test table display on mobile devices (320px - 768px)
+  - [x] 5.2 Test table display on tablet devices (768px - 1024px)
+  - [x] 5.3 Test table display on desktop devices (1024px+)
+  - [x] 5.4 Verify button sizing and touch targets on mobile devices
+  - [x] 5.5 Test table functionality across Chrome, Firefox, Safari, and Edge
+  - [x] 5.6 Validate accessibility with screen readers and keyboard navigation
+  - [x] 5.7 Confirm all existing features work: search, pagination, filters, actions

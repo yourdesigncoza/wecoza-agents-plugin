@@ -6,6 +6,19 @@
  */
 
 jQuery(document).ready(function($) {
+    // Disable Select2 on plugin form elements
+    if (typeof $.fn.select2 !== 'undefined') {
+        // Destroy any existing Select2 instances on our form
+        $('#agents-form select').each(function() {
+            if ($(this).hasClass('select2-hidden-accessible')) {
+                $(this).select2('destroy');
+            }
+        });
+        
+        // Prevent Select2 from initializing on our form elements
+        $('#agents-form select').addClass('no-select2');
+    }
+    
     // ID Type Toggle
     $('input[name="id_type"]').on('change', function() {
         if ($(this).val() === 'sa_id') {
@@ -20,15 +33,6 @@ jQuery(document).ready(function($) {
             $('#passport_number').prop('required', true);
         }
     });
-    
-    // Initialize Select2 for preferred working areas if available
-    if ($.fn.select2) {
-        $('[id^="preferred_working_area_"]').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Select a location'
-        });
-    }
     
     // Bootstrap form validation
     var forms = document.querySelectorAll('.needs-validation');

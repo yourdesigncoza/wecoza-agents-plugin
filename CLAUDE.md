@@ -13,13 +13,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Key Development Patterns
 - **Singleton Pattern**: Main plugin class uses singleton for single instance
 - **Component-Based Architecture**: Modular components loaded by main plugin class
+- **Component Loading Order**: Core classes → Database → Shortcodes → Helpers → Forms → Models
 - **WordPress Hooks**: Actions and filters for WordPress integration
 - **Template Override System**: Templates can be overridden in active theme
 
 ### Database Architecture
 - **Dual Database Support**: PostgreSQL (primary) with MySQL fallback via `DatabaseService`
-- **Main Tables**: `agents`, `agent_meta`, `agent_notes`, `agent_absences`
+- **Main Tables**: `wecoza_agents`, `wecoza_agent_meta`, `wecoza_agent_notes`, `wecoza_agent_absences`
 - **Model Pattern**: Active Record pattern with built-in validation and CRUD operations
+- **Connection Management**: Automatic failover from PostgreSQL to MySQL if connection fails
 - **Validation**: SA ID checksum validation, passport format validation, comprehensive field validation
 
 ### WordPress Integration Points
@@ -36,9 +38,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development Commands
 - **Code Standards**: `composer check-cs` (referenced in README, requires composer setup)
+- **No Build Process**: Direct file editing workflow - no npm, webpack, or compilation required
+- **Asset Loading**: Unminified files for development, minified versions for production
+- **Database Setup**: Automatic via plugin activation through WordPress admin
 - **Debug Logging**: Plugin logs to `/logs/` directory and WordPress debug log
-- **Database Migration**: Automatic schema updates via `includes/class-migration.php`
-- **Plugin Activation**: Handled by `includes/class-activator.php` with database setup
 
 ### Security Features
 - **Nonce Verification**: All forms use WordPress nonces
@@ -61,9 +64,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Styling**: Add CSS to main theme's `ydcoza-styles.css` file (per global instructions)
 
 ### Plugin Configuration
-- **Database Settings**: WordPress options for PostgreSQL connection
+- **Database Settings**: WordPress options for PostgreSQL connection:
+  - `wecoza_postgres_host`, `wecoza_postgres_port`, `wecoza_postgres_dbname`
+  - `wecoza_postgres_user`, `wecoza_postgres_password`
 - **Plugin Options**: `wecoza_agents_settings` for plugin configuration
 - **Constants**: Defined in main plugin file and `includes/class-constants.php`
+- **Requirements**: WordPress 6.0+, PHP 7.4+, Bootstrap 5 (from parent theme)
 
 ### File Upload Handling
 - **Agent Agreements**: File upload support with validation
@@ -77,6 +83,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Search/Filter**: Real-time table filtering and search
 
 ### Testing and Validation
+- **No Test Framework**: Manual testing through WordPress admin and frontend
 - **SA ID Validation**: Built-in South African ID checksum validation
 - **Form Validation**: Client-side and server-side validation
 - **Data Integrity**: Comprehensive model validation before database operations

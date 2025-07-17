@@ -94,7 +94,6 @@ class Plugin {
         
         $this->load_dependencies();
         $this->set_locale();
-        $this->define_admin_hooks();
         $this->define_public_hooks();
         $this->register_shortcodes();
     }
@@ -273,17 +272,6 @@ class Plugin {
         // to ensure it loads before any translation functions are called
     }
 
-    /**
-     * Register all admin hooks
-     *
-     * @since 1.0.0
-     */
-    private function define_admin_hooks() {
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
-        add_action('admin_menu', array($this, 'add_admin_menu'));
-        add_action('admin_init', array($this, 'admin_init'));
-    }
 
     /**
      * Register all public hooks
@@ -385,49 +373,6 @@ class Plugin {
         <?php
     }
 
-    /**
-     * Admin initialization
-     *
-     * @since 1.0.0
-     */
-    public function admin_init() {
-        // Register settings
-        $this->register_settings();
-        
-        // Check for updates
-        $this->check_version();
-    }
-
-    /**
-     * Register plugin settings
-     *
-     * @since 1.0.0
-     */
-    private function register_settings() {
-        register_setting(
-            'wecoza_agents_settings_group',
-            'wecoza_agents_settings',
-            array($this, 'validate_settings')
-        );
-    }
-
-    /**
-     * Validate settings
-     *
-     * @since 1.0.0
-     * @param array $input Input data
-     * @return array Validated data
-     */
-    public function validate_settings($input) {
-        $validated = array();
-        
-        // Validate each setting
-        if (isset($input['enable_debug'])) {
-            $validated['enable_debug'] = (bool) $input['enable_debug'];
-        }
-        
-        return $validated;
-    }
 
     /**
      * Check plugin version and run upgrades if needed
@@ -455,132 +400,8 @@ class Plugin {
         do_action('wecoza_agents_upgrade', $old_version, $new_version);
     }
 
-    /**
-     * Add admin menu
-     *
-     * @since 1.0.0
-     */
-    public function add_admin_menu() {
-        add_menu_page(
-            __('WeCoza Agents', 'wecoza-agents-plugin'),
-            __('Agents', 'wecoza-agents-plugin'),
-            'manage_options',
-            'wecoza-agents',
-            array($this, 'admin_page'),
-            'dashicons-groups',
-            30
-        );
-        
-        add_submenu_page(
-            'wecoza-agents',
-            __('All Agents', 'wecoza-agents-plugin'),
-            __('All Agents', 'wecoza-agents-plugin'),
-            'manage_options',
-            'wecoza-agents',
-            array($this, 'admin_page')
-        );
-        
-        add_submenu_page(
-            'wecoza-agents',
-            __('Add New Agent', 'wecoza-agents-plugin'),
-            __('Add New', 'wecoza-agents-plugin'),
-            'manage_options',
-            'wecoza-agents-add',
-            array($this, 'admin_add_page')
-        );
-        
-        add_submenu_page(
-            'wecoza-agents',
-            __('Settings', 'wecoza-agents-plugin'),
-            __('Settings', 'wecoza-agents-plugin'),
-            'manage_options',
-            'wecoza-agents-settings',
-            array($this, 'admin_settings_page')
-        );
-    }
 
-    /**
-     * Admin page content
-     *
-     * @since 1.0.0
-     */
-    public function admin_page() {
-        echo '<div class="wrap">';
-        echo '<h1>' . esc_html__('WeCoza Agents', 'wecoza-agents-plugin') . '</h1>';
-        echo '<p>' . esc_html__('Manage your agents here.', 'wecoza-agents-plugin') . '</p>';
-        echo '</div>';
-    }
 
-    /**
-     * Admin add page content
-     *
-     * @since 1.0.0
-     */
-    public function admin_add_page() {
-        echo '<div class="wrap">';
-        echo '<h1>' . esc_html__('Add New Agent', 'wecoza-agents-plugin') . '</h1>';
-        echo do_shortcode('[wecoza_capture_agents]');
-        echo '</div>';
-    }
-
-    /**
-     * Admin settings page content
-     *
-     * @since 1.0.0
-     */
-    public function admin_settings_page() {
-        include WECOZA_AGENTS_PLUGIN_DIR . 'templates/admin/settings.php';
-    }
-
-    /**
-     * Enqueue admin styles
-     *
-     * @since 1.0.0
-     * @param string $hook Page hook
-     */
-    public function enqueue_admin_styles($hook) {
-        // Only load on our admin pages
-        if (strpos($hook, 'wecoza-agents') === false) {
-            return;
-        }
-        
-        wp_enqueue_style(
-            'wecoza-agents-admin',
-            WECOZA_AGENTS_CSS_URL . 'admin.css',
-            array(),
-            $this->version
-        );
-    }
-
-    /**
-     * Enqueue admin scripts
-     *
-     * @since 1.0.0
-     * @param string $hook Page hook
-     */
-    public function enqueue_admin_scripts($hook) {
-        // Only load on our admin pages
-        if (strpos($hook, 'wecoza-agents') === false) {
-            return;
-        }
-        
-        wp_enqueue_script(
-            'wecoza-agents-admin',
-            WECOZA_AGENTS_JS_URL . 'admin.js',
-            array('jquery'),
-            $this->version,
-            true
-        );
-        
-        wp_localize_script(
-            'wecoza-agents-admin',
-            'wecoza_agents_admin',
-            array(
-                'ajax_url' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('wecoza_agents_admin'),
-            )
-        );
-    }
 
     /**
      * Enqueue public styles
