@@ -171,8 +171,11 @@ function wecoza_agents_activate() {
         );
     }
 
+    require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-constants.php';
+    \WeCoza\Agents\Includes\Constants::define_constants();
+    
     require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-activator.php';
-    \WeCoza\Agents\Activator::activate();
+    \WeCoza\Agents\Includes\Activator::activate();
 }
 register_activation_hook(__FILE__, 'wecoza_agents_activate');
 
@@ -180,8 +183,11 @@ register_activation_hook(__FILE__, 'wecoza_agents_activate');
  * Deactivation hook
  */
 function wecoza_agents_deactivate() {
+    require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-constants.php';
+    \WeCoza\Agents\Includes\Constants::define_constants();
+    
     require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-deactivator.php';
-    \WeCoza\Agents\Deactivator::deactivate();
+    \WeCoza\Agents\Includes\Deactivator::deactivate();
 }
 register_deactivation_hook(__FILE__, 'wecoza_agents_deactivate');
 
