@@ -201,7 +201,7 @@ class BackwardsCompatibility {
             wp_enqueue_script(
                 'wecoza-agents', 
                 WECOZA_AGENTS_JS_URL . 'agents-app.js', 
-                array('jquery', 'select2'), 
+                array('jquery'), 
                 WECOZA_AGENTS_VERSION, 
                 true
             );

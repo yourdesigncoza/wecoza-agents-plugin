@@ -34,6 +34,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **WordPress Standards**: Follows WordPress coding standards and security practices
 - **Template Development**: Templates in `templates/` directory with theme override support
 
+### Development Commands
+- **Code Standards**: `composer check-cs` (referenced in README, requires composer setup)
+- **Debug Logging**: Plugin logs to `/logs/` directory and WordPress debug log
+- **Database Migration**: Automatic schema updates via `includes/class-migration.php`
+- **Plugin Activation**: Handled by `includes/class-activator.php` with database setup
+
 ### Security Features
 - **Nonce Verification**: All forms use WordPress nonces
 - **Capability Checks**: Proper permission verification
@@ -74,3 +80,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **SA ID Validation**: Built-in South African ID checksum validation
 - **Form Validation**: Client-side and server-side validation
 - **Data Integrity**: Comprehensive model validation before database operations
+
+### WordPress Hooks Integration
+- **Actions**: `wecoza_agents_before_capture_form`, `wecoza_agents_after_capture_form`, `wecoza_agents_before_display_table`, `wecoza_agents_after_display_table`
+- **Filters**: `wecoza_agents_form_fields`, `wecoza_agents_table_columns`, `wecoza_agents_validation_rules`
+- **Custom Hooks**: Extensive hook system for third-party extensions
+
+### Debugging and Logging
+- **Debug Directory**: `/logs/` directory for plugin-specific logs
+- **Database Logger**: `src/Database/DatabaseLogger.php` for query logging
+- **Error Handling**: Comprehensive error logging with WordPress debug integration
+- **Console Logging**: Client-side debugging via `console.txt` and JavaScript logging

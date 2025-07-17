@@ -600,14 +600,6 @@ class Plugin {
             array(),
             $this->version
         );
-        
-        // Enqueue Select2 if needed
-        wp_enqueue_style(
-            'select2',
-            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-            array(),
-            '4.1.0-rc.0'
-        );
     }
 
     /**
@@ -621,20 +613,11 @@ class Plugin {
             return;
         }
         
-        // Enqueue Select2
-        wp_enqueue_script(
-            'select2',
-            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
-            array('jquery'),
-            '4.1.0-rc.0',
-            true
-        );
-        
         // Enqueue main script
         wp_enqueue_script(
             'wecoza-agents',
             WECOZA_AGENTS_JS_URL . 'agents-app.js',
-            array('jquery', 'select2'),
+            array('jquery'),
             $this->version,
             true
         );

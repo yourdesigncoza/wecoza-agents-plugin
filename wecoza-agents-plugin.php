@@ -121,10 +121,9 @@ function wecoza_agents_init() {
         return; // Don't initialize if requirements not met
     }
 
-    // Load Composer autoloader if available
-    if (file_exists(WECOZA_AGENTS_PLUGIN_DIR . 'vendor/autoload.php')) {
-        require_once WECOZA_AGENTS_PLUGIN_DIR . 'vendor/autoload.php';
-    }
+    // Load new MVC classes
+    require_once WECOZA_AGENTS_PLUGIN_DIR . 'src/Services/WorkingAreasService.php';
+    require_once WECOZA_AGENTS_PLUGIN_DIR . 'src/Helpers/FormHelpers.php';
 
     // Load and define constants
     require_once WECOZA_AGENTS_PLUGIN_DIR . 'includes/class-constants.php';

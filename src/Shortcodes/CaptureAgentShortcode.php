@@ -10,6 +10,9 @@
 
 namespace WeCoza\Agents\Shortcodes;
 
+use WeCoza\Agents\Services\WorkingAreasService;
+use WeCoza\Agents\Helpers\FormHelpers;
+
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
@@ -76,24 +79,17 @@ class CaptureAgentShortcode extends AbstractShortcode {
     protected function enqueue_assets() {
         parent::enqueue_assets();
         
-        // Enqueue Select2
-        wp_enqueue_style(
-            'select2',
-            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-            array(),
-            '4.1.0-rc.0'
-        );
-        
+        // Enqueue agent form validation
         wp_enqueue_script(
-            'select2',
-            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+            'wecoza-agent-form-validation',
+            WECOZA_AGENTS_PLUGIN_URL . 'assets/js/agent-form-validation.js',
             array('jquery'),
-            '4.1.0-rc.0',
+            '1.0.0',
             true
         );
         
         // Update script dependencies
-        wp_script_add_data('wecoza-agents', 'deps', array('jquery', 'select2'));
+        wp_script_add_data('wecoza-agents', 'deps', array('jquery'));
     }
 
     /**
@@ -437,12 +433,20 @@ class CaptureAgentShortcode extends AbstractShortcode {
         // Prepare form data
         $agent = $this->current_agent ?: $this->form_data;
         
+        // Process preferred areas from JSON
+        $preferred_areas = isset($agent['preferred_areas']) ? json_decode($agent['preferred_areas'], true) : array();
+        if (!is_array($preferred_areas)) {
+            $preferred_areas = array();
+        }
+        
         // Load template
         $this->load_template('agent-capture-form.php', array(
             'agent' => $agent,
             'errors' => $this->form_errors,
             'mode' => $this->current_agent ? 'edit' : 'add',
             'atts' => $atts,
+            'working_areas' => WorkingAreasService::get_working_areas(),
+            'preferred_areas' => $preferred_areas,
         ), 'forms');
     }
 
