@@ -612,7 +612,6 @@ class AgentQueries {
             'first_name' => 'sanitize_text_field',
             'second_name' => 'sanitize_text_field',  // Added missing field
             'surname' => 'sanitize_text_field',  // Database column name
-            'known_as' => 'sanitize_text_field',
             'initials' => 'sanitize_text_field',
             'gender' => 'sanitize_text_field',
             'race' => 'sanitize_text_field',
@@ -649,8 +648,8 @@ class AgentQueries {
             'highest_qualification' => 'sanitize_text_field',
             
             // Quantum Tests (database column names)
-            'quantum_maths_passed' => 'absint',
-            'quantum_science_passed' => 'absint',
+            'quantum_maths_score' => 'absint',
+            'quantum_science_score' => 'absint',
             'quantum_assessment' => 'absint',  // Fixed spelling and changed to absint for numbers
             
             // Criminal Record (database column names)

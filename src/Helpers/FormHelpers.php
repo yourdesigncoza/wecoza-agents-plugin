@@ -51,6 +51,10 @@ class FormHelpers {
         // Primary key mapping
         'id' => 'agent_id',
         'agent_id' => 'agent_id',
+        
+        // Quantum score fields
+        'quantum_maths_score' => 'quantum_maths_score',
+        'quantum_science_score' => 'quantum_science_score',
     ];
 
     /**

@@ -221,7 +221,6 @@ class CaptureAgentShortcode extends AbstractShortcode {
             'second_name' => $this->process_text_field($this->get_request_param('second_name', '', 'POST')),
             'surname' => sanitize_text_field($this->get_request_param('surname', '', 'POST')),  // DB field name
             'initials' => sanitize_text_field($this->get_request_param('initials', '', 'POST')),
-            'known_as' => sanitize_text_field($this->get_request_param('known_as', '', 'POST')),
             'gender' => sanitize_text_field($this->get_request_param('gender', '', 'POST')),
             'race' => sanitize_text_field($this->get_request_param('race', '', 'POST')),
             
@@ -258,8 +257,8 @@ class CaptureAgentShortcode extends AbstractShortcode {
             'highest_qualification' => sanitize_text_field($this->get_request_param('highest_qualification', '', 'POST')),
             
             // Quantum Tests
-            'quantum_maths_passed' => (bool) $this->get_request_param('quantum_maths_passed', false, 'POST'),
-            'quantum_science_passed' => (bool) $this->get_request_param('quantum_science_passed', false, 'POST'),
+            'quantum_maths_score' => $this->process_numeric_field($this->get_request_param('quantum_maths_score', '', 'POST')),
+            'quantum_science_score' => $this->process_numeric_field($this->get_request_param('quantum_science_score', '', 'POST')),
             'quantum_assessment' => $this->process_numeric_field($this->get_request_param('quantum_assessment', '', 'POST')),
             
             // Training

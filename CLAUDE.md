@@ -22,10 +22,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Main Tables**: `wecoza_agents`, `wecoza_agent_meta`, `wecoza_agent_notes`, `wecoza_agent_absences`
 - **Model Pattern**: Active Record pattern with built-in validation and CRUD operations
 - **Connection Management**: Automatic failover from PostgreSQL to MySQL if connection fails
+- **Field Mapping**: Form fields to database columns via `FormHelpers::getFieldMapping()`
 - **Validation**: SA ID checksum validation, passport format validation, comprehensive field validation
 
 ### WordPress Integration Points
-- **Shortcodes**: `[wecoza_capture_agents]` (form), `[wecoza_display_agents]` (table)
+- **Shortcodes**: `[wecoza_capture_agents]` (form), `[wecoza_display_agents]` (table), `[wecoza_single_agent]` (single view)
 - **Admin Integration**: Settings page, plugin action links
 - **Asset Management**: CSS/JS enqueuing with Bootstrap 5 and jQuery dependencies
 - **Hooks**: Custom actions and filters for extensibility
@@ -50,17 +51,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **SQL Injection Prevention**: Prepared statements throughout
 
 ### Key Files to Understand
-- `src/Database/DatabaseService.php` - Database abstraction layer
-- `src/Models/Agent.php` - Core agent model with validation
-- `src/Shortcodes/CaptureAgentShortcode.php` - Form handling
-- `src/Shortcodes/DisplayAgentShortcode.php` - Table display
+- `src/Database/DatabaseService.php` - Database abstraction layer with PostgreSQL/MySQL failover
+- `src/Database/AgentQueries.php` - Agent-specific database queries and operations
+- `src/Models/Agent.php` - Core agent model with Active Record pattern and validation
+- `src/Shortcodes/CaptureAgentShortcode.php` - Form handling and agent creation/editing
+- `src/Shortcodes/DisplayAgentShortcode.php` - Table display with search and filtering
+- `src/Shortcodes/SingleAgentShortcode.php` - Single agent display and modal views
+- `src/Helpers/FormHelpers.php` - Form field mapping and rendering utilities
+- `src/Helpers/ValidationHelper.php` - SA ID checksum and validation logic
 - `templates/forms/agent-capture-form.php` - Main form template
-- `templates/display/agent-display-table.php` - Table template
+- `templates/display/agent-display-table.php` - Agents table with search/filter
+- `templates/display/agent-single-display.php` - Single agent modal template
+
+### Agent Search and Statistics System
+- **Real-time Search**: JavaScript-based filtering across all agent fields
+- **Statistics Display**: Dynamic counters for total agents, active/inactive counts
+- **Field-specific Filtering**: Search by name, email, phone, SA ID, area preferences
+- **Modal Integration**: Click-to-view agent details without page refresh
+- **Data Attributes**: Searchable data stored in HTML data attributes for client-side filtering
 
 ### Common Development Tasks
-- **Adding Fields**: Modify agent model, form template, and validation rules
+- **Adding Fields**: Modify agent model, form template, validation rules, and field mapping
 - **Template Modifications**: Edit files in `templates/` directory
-- **Database Changes**: Update `DatabaseService` queries and model validation
+- **Database Changes**: Update `DatabaseService` queries, model validation, and field mapping
+- **Search Enhancement**: Add new fields to searchable data attributes in templates
 - **Styling**: Add CSS to main theme's `ydcoza-styles.css` file (per global instructions)
 
 ### Plugin Configuration
@@ -77,10 +91,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Validation**: File type and size validation
 
 ### Frontend Features
-- **Responsive Design**: Bootstrap 5 integration
-- **Interactive Elements**: jQuery and Select2 for enhanced UX
-- **Modal Display**: Agent details in responsive modals
-- **Search/Filter**: Real-time table filtering and search
+- **Responsive Design**: Bootstrap 5 integration with Phoenix design system
+- **Interactive Elements**: jQuery-based interactions and form validation
+- **Modal Display**: Agent details in responsive modals with single agent view
+- **Search/Filter**: Real-time table filtering, search, and statistics
+- **Google Maps**: Address autocomplete integration
+- **File Uploads**: Agent agreement document handling with validation
 
 ### Testing and Validation
 - **No Test Framework**: Manual testing through WordPress admin and frontend

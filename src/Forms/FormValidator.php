@@ -123,7 +123,6 @@ class FormValidator {
         switch ($this->form_type) {
             case 'agent_capture':
                 $this->labels = array_merge($this->labels, array(
-                    'known_as' => __('Known as', 'wecoza-agents-plugin'),
                     'title' => __('Title', 'wecoza-agents-plugin'),
                     'initials' => __('Initials', 'wecoza-agents-plugin'),
                     'highest_qualification' => __('Highest qualification', 'wecoza-agents-plugin'),
@@ -164,7 +163,6 @@ class FormValidator {
         // Add additional rules for capture form
         $rules['title'] = 'in:Mr,Mrs,Ms,Miss,Dr,Prof';
         $rules['initials'] = 'alpha|max_length:10';
-        $rules['known_as'] = 'alpha|max_length:50';
         $rules['highest_qualification'] = 'max_length:100';
         
         // Date fields

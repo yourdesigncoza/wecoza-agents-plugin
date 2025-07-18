@@ -187,8 +187,6 @@ class AgentCaptureForm {
         
         // Handle checkboxes
         $checkbox_fields = array(
-            'quantum_maths_passed',
-            'quantum_science_passed',
             'criminal_record_checked',
             'signed_agreement'
         );
@@ -212,7 +210,6 @@ class AgentCaptureForm {
             'title' => 'title',
             'first_name' => 'first_name',
             'surname' => 'last_name',
-            'known_as' => 'known_as',
             'gender' => 'gender',
             'race' => 'race',
             

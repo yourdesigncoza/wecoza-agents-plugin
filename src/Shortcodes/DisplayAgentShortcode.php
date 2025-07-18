@@ -231,8 +231,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Cape Town',
                 'status' => 'active',
                 'sace_number' => 'SACE123456',
-                'quantum_maths_passed' => true,
-                'quantum_science_passed' => true,
+                'quantum_maths_score' => 85,
+                'quantum_science_score' => 92,
                 'signed_agreement' => true,
             ),
             array(
@@ -247,8 +247,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Johannesburg',
                 'status' => 'active',
                 'sace_number' => 'SACE789012',
-                'quantum_maths_passed' => false,
-                'quantum_science_passed' => true,
+                'quantum_maths_score' => 0,
+                'quantum_science_score' => 78,
                 'signed_agreement' => true,
             ),
             array(
@@ -263,8 +263,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Durban',
                 'status' => 'active',
                 'sace_number' => '',
-                'quantum_maths_passed' => true,
-                'quantum_science_passed' => false,
+                'quantum_maths_score' => 88,
+                'quantum_science_score' => 0,
                 'signed_agreement' => true,
             ),
             array(
@@ -279,8 +279,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Pretoria',
                 'status' => 'active',
                 'sace_number' => 'SACE345678',
-                'quantum_maths_passed' => true,
-                'quantum_science_passed' => true,
+                'quantum_maths_score' => 85,
+                'quantum_science_score' => 92,
                 'signed_agreement' => false,
             ),
             array(
@@ -295,8 +295,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Bloemfontein',
                 'status' => 'inactive',
                 'sace_number' => 'SACE567890',
-                'quantum_maths_passed' => false,
-                'quantum_science_passed' => false,
+                'quantum_maths_score' => 0,
+                'quantum_science_score' => 0,
                 'signed_agreement' => true,
             ),
             array(
@@ -311,8 +311,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Port Elizabeth',
                 'status' => 'active',
                 'sace_number' => 'SACE678901',
-                'quantum_maths_passed' => false,
-                'quantum_science_passed' => true,
+                'quantum_maths_score' => 0,
+                'quantum_science_score' => 78,
                 'signed_agreement' => true,
             ),
             array(
@@ -327,8 +327,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'East London',
                 'status' => 'active',
                 'sace_number' => '',
-                'quantum_maths_passed' => true,
-                'quantum_science_passed' => false,
+                'quantum_maths_score' => 88,
+                'quantum_science_score' => 0,
                 'signed_agreement' => true,
             ),
             array(
@@ -343,8 +343,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Kimberley',
                 'status' => 'active',
                 'sace_number' => 'SACE890123',
-                'quantum_maths_passed' => true,
-                'quantum_science_passed' => true,
+                'quantum_maths_score' => 85,
+                'quantum_science_score' => 92,
                 'signed_agreement' => true,
             ),
             array(
@@ -359,8 +359,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Polokwane',
                 'status' => 'active',
                 'sace_number' => 'SACE901234',
-                'quantum_maths_passed' => false,
-                'quantum_science_passed' => false,
+                'quantum_maths_score' => 0,
+                'quantum_science_score' => 0,
                 'signed_agreement' => true,
             ),
             array(
@@ -375,8 +375,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'city' => 'Nelspruit',
                 'status' => 'active',
                 'sace_number' => 'SACE012345',
-                'quantum_maths_passed' => true,
-                'quantum_science_passed' => false,
+                'quantum_maths_score' => 88,
+                'quantum_science_score' => 0,
                 'signed_agreement' => true,
             ),
         );
@@ -546,8 +546,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
             return !empty($agent['sace_number']);
         }));
         $quantum_qualified = count(array_filter($all_agents, function($agent) {
-            return (isset($agent['quantum_maths_passed']) && $agent['quantum_maths_passed']) ||
-                   (isset($agent['quantum_science_passed']) && $agent['quantum_science_passed']);
+            return (isset($agent['quantum_maths_score']) && $agent['quantum_maths_score'] > 0) ||
+                   (isset($agent['quantum_science_score']) && $agent['quantum_science_score'] > 0);
         }));
         $agreement_signed = count(array_filter($all_agents, function($agent) {
             return isset($agent['signed_agreement']) && $agent['signed_agreement'];

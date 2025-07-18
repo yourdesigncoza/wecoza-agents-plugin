@@ -69,7 +69,6 @@ class Agent {
         'first_name' => '',
         'second_name' => '',  // New field added
         'surname' => '',  // Database column name
-        'known_as' => '',
         'initials' => '',
         'gender' => '',
         'race' => '',
@@ -106,8 +105,8 @@ class Agent {
         'highest_qualification' => '',
         
         // Quantum Tests (matches database)
-        'quantum_maths_passed' => false,  // New column added
-        'quantum_science_passed' => false,  // New column added
+        'quantum_maths_score' => 0,  // Changed from boolean to numeric score
+        'quantum_science_score' => 0,  // Changed from boolean to numeric score
         'quantum_assessment' => '',  // Fixed typo from quantum_assesment
         
         // Criminal Record (matches database)
@@ -326,8 +325,6 @@ class Agent {
         
         // Convert boolean fields
         $boolean_fields = array(
-            'quantum_maths_passed',
-            'quantum_science_passed',
             'criminal_record_checked',
             'signed_agreement'
         );
@@ -651,9 +648,6 @@ class Agent {
             $parts[] = $this->get('first_name');
         }
         
-        if ($this->get('known_as') && $this->get('known_as') !== $this->get('first_name')) {
-            $parts[] = '(' . $this->get('known_as') . ')';
-        }
         
         if ($this->get('surname')) {
             $parts[] = $this->get('surname');
@@ -733,15 +727,15 @@ class Agent {
      */
     public function has_quantum_qualification($type = null) {
         if ($type === 'maths') {
-            return (bool) $this->get('quantum_maths_passed');
+            return $this->get('quantum_maths_score') > 0;
         }
         
         if ($type === 'science') {
-            return (bool) $this->get('quantum_science_passed');
+            return $this->get('quantum_science_score') > 0;
         }
         
         // Check if has any quantum qualification
-        return $this->get('quantum_maths_passed') || $this->get('quantum_science_passed');
+        return $this->get('quantum_maths_score') > 0 || $this->get('quantum_science_score') > 0;
     }
 
     /**

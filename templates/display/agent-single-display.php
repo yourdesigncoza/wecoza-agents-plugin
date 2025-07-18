@@ -369,18 +369,18 @@ if (!defined('ABSPATH')) {
                                 </td>
                                 <td class="py-2">
                                     <div class="fw-semibold mb-0">
-                                        <?php if ($agent['quantum_maths_passed']) : ?>
-                                            <span class="badge badge-phoenix fs-10 badge-phoenix-success me-1">
-                                                <i class="bi bi-check me-1"></i><?php esc_html_e('Maths', 'wecoza-agents-plugin'); ?>
+                                        <?php if (isset($agent['quantum_maths_score']) && $agent['quantum_maths_score'] > 0) : ?>
+                                            <span class="badge badge-phoenix fs-10 badge-phoenix-info me-1">
+                                                <?php esc_html_e('Maths:', 'wecoza-agents-plugin'); ?> <?php echo esc_html($agent['quantum_maths_score']); ?>%
                                             </span>
                                         <?php endif; ?>
-                                        <?php if ($agent['quantum_science_passed']) : ?>
-                                            <span class="badge badge-phoenix fs-10 badge-phoenix-success">
-                                                <i class="bi bi-check me-1"></i><?php esc_html_e('Science', 'wecoza-agents-plugin'); ?>
+                                        <?php if (isset($agent['quantum_science_score']) && $agent['quantum_science_score'] > 0) : ?>
+                                            <span class="badge badge-phoenix fs-10 badge-phoenix-info">
+                                                <?php esc_html_e('Science:', 'wecoza-agents-plugin'); ?> <?php echo esc_html($agent['quantum_science_score']); ?>%
                                             </span>
                                         <?php endif; ?>
-                                        <?php if (!$agent['quantum_maths_passed'] && !$agent['quantum_science_passed']) : ?>
-                                            <span class="text-muted"><?php esc_html_e('None passed', 'wecoza-agents-plugin'); ?></span>
+                                        <?php if ((!isset($agent['quantum_maths_score']) || $agent['quantum_maths_score'] == 0) && (!isset($agent['quantum_science_score']) || $agent['quantum_science_score'] == 0)) : ?>
+                                            <span class="text-muted"><?php esc_html_e('Not taken', 'wecoza-agents-plugin'); ?></span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
