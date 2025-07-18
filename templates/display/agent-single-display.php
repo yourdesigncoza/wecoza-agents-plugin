@@ -148,7 +148,7 @@ if (!defined('ABSPATH')) {
                                 <p class="fw-bold mb-1"><?php esc_html_e('SACE Registration', 'wecoza-agents-plugin'); ?></p>
                                 <h5 class="fw-bolder text-nowrap">
                                     <?php if (!empty($agent['sace_number'])) : ?>
-                                        <span class="text-success"><?php echo esc_html($agent['sace_number']); ?></span>
+                                        <span><?php echo esc_html($agent['sace_number']); ?></span>
                                     <?php else : ?>
                                         <span class="text-muted"><?php esc_html_e('Not Registered', 'wecoza-agents-plugin'); ?></span>
                                     <?php endif; ?>
@@ -194,7 +194,7 @@ if (!defined('ABSPATH')) {
                                     </div>
                                 </td>
                                 <td class="py-2">
-                                    <p class="fw-semibold mb-0">#<?php echo esc_html($agent['id']); ?></p>
+                                    <p class="fw-semibold mb-0">#<?php echo esc_html($agent['agent_id']); ?></p>
                                 </td>
                             </tr>
                             

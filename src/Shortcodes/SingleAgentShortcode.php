@@ -89,7 +89,7 @@ class SingleAgentShortcode extends AbstractShortcode {
         
         // Search for the agent with matching ID
         foreach ($agents as $agent) {
-            if (isset($agent['id']) && (int)$agent['id'] === (int)$agent_id) {
+            if (isset($agent['agent_id']) && (int)$agent['agent_id'] === (int)$agent_id) {
                 return $agent;
             }
         }
@@ -107,7 +107,7 @@ class SingleAgentShortcode extends AbstractShortcode {
         // Using the same data structure as DisplayAgentShortcode
         return array(
             array(
-                'id' => 1,
+                'agent_id' => 1,
                 'first_name' => 'Peter',
                 'initials' => 'P.',
                 'last_name' => 'Wessels',
@@ -141,7 +141,7 @@ class SingleAgentShortcode extends AbstractShortcode {
                 'notes' => 'Experienced mathematics teacher',
             ),
             array(
-                'id' => 2,
+                'agent_id' => 2,
                 'first_name' => 'Sarah',
                 'initials' => 'S.',
                 'last_name' => 'Johnson',
@@ -175,7 +175,7 @@ class SingleAgentShortcode extends AbstractShortcode {
                 'notes' => 'Specializes in physical sciences',
             ),
             array(
-                'id' => 3,
+                'agent_id' => 3,
                 'first_name' => 'David',
                 'initials' => 'D.',
                 'last_name' => 'Smith',

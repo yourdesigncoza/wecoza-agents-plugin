@@ -52,13 +52,12 @@ class AgentQueries {
      * @since 1.0.0
      */
     private function init_tables() {
-        $prefix = $this->db->get_table_prefix();
-        
+        // PostgreSQL-only table names (no prefix needed)
         $this->tables = array(
-            'agents' => $this->db->get_db_type() === 'postgresql' ? 'agents' : $prefix . 'wecoza_agents',
-            'agent_meta' => $this->db->get_db_type() === 'postgresql' ? 'agent_meta' : $prefix . 'wecoza_agent_meta',
-            'agent_notes' => $this->db->get_db_type() === 'postgresql' ? 'agent_notes' : $prefix . 'wecoza_agent_notes',
-            'agent_absences' => $this->db->get_db_type() === 'postgresql' ? 'agent_absences' : $prefix . 'wecoza_agent_absences',
+            'agents' => 'agents',
+            'agent_meta' => 'agent_meta',
+            'agent_notes' => 'agent_notes',
+            'agent_absences' => 'agent_absences',
         );
     }
 
@@ -84,17 +83,17 @@ class AgentQueries {
         // Sanitize and validate data
         $clean_data = $this->sanitize_agent_data($data);
         
-        if (empty($clean_data['first_name']) || empty($clean_data['last_name']) || empty($clean_data['email'])) {
+        if (empty($clean_data['first_name']) || empty($clean_data['surname']) || empty($clean_data['email_address'])) {
             return false;
         }
         
         // Check if email already exists
-        if ($this->get_agent_by_email($clean_data['email'])) {
+        if ($this->get_agent_by_email($clean_data['email_address'])) {
             return false;
         }
         
         // Check if ID number already exists
-        if (!empty($clean_data['id_number']) && $this->get_agent_by_id_number($clean_data['id_number'])) {
+        if (!empty($clean_data['sa_id_no']) && $this->get_agent_by_id_number($clean_data['sa_id_no'])) {
             return false;
         }
         
@@ -116,16 +115,13 @@ class AgentQueries {
      * @return array|null Agent data or null if not found
      */
     public function get_agent($agent_id) {
-        $sql = "SELECT * FROM {$this->get_table('agents')} WHERE id = :id AND status != 'deleted' LIMIT 1";
-        $params = array('id' => $agent_id);
+        $sql = "SELECT * FROM {$this->get_table('agents')} WHERE agent_id = :agent_id AND status != 'deleted' LIMIT 1";
+        $params = array('agent_id' => $agent_id);
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            return $result ? $result->fetch() : null;
-        } else {
-            return !empty($result) ? $result[0] : null;
-        }
+        // PostgreSQL-only result handling
+        return $result ? $result->fetch() : null;
     }
 
     /**
@@ -136,16 +132,13 @@ class AgentQueries {
      * @return array|null Agent data or null if not found
      */
     public function get_agent_by_email($email) {
-        $sql = "SELECT * FROM {$this->get_table('agents')} WHERE email = :email AND status != 'deleted' LIMIT 1";
+        $sql = "SELECT * FROM {$this->get_table('agents')} WHERE email_address = :email AND status != 'deleted' LIMIT 1";
         $params = array('email' => $email);
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            return $result ? $result->fetch() : null;
-        } else {
-            return !empty($result) ? $result[0] : null;
-        }
+        // PostgreSQL-only result handling
+        return $result ? $result->fetch() : null;
     }
 
     /**
@@ -156,16 +149,13 @@ class AgentQueries {
      * @return array|null Agent data or null if not found
      */
     public function get_agent_by_id_number($id_number) {
-        $sql = "SELECT * FROM {$this->get_table('agents')} WHERE id_number = :id_number AND status != 'deleted' LIMIT 1";
+        $sql = "SELECT * FROM {$this->get_table('agents')} WHERE sa_id_no = :id_number AND status != 'deleted' LIMIT 1";
         $params = array('id_number' => $id_number);
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            return $result ? $result->fetch() : null;
-        } else {
-            return !empty($result) ? $result[0] : null;
-        }
+        // PostgreSQL-only result handling
+        return $result ? $result->fetch() : null;
     }
 
     /**
@@ -207,10 +197,10 @@ class AgentQueries {
             $search = '%' . $args['search'] . '%';
             $sql .= " AND (
                 first_name LIKE :search1 OR 
-                last_name LIKE :search2 OR 
-                email LIKE :search3 OR 
-                phone LIKE :search4 OR
-                id_number LIKE :search5
+                surname LIKE :search2 OR 
+                email_address LIKE :search3 OR 
+                tel_number LIKE :search4 OR
+                sa_id_no LIKE :search5
             )";
             $params['search1'] = $search;
             $params['search2'] = $search;
@@ -220,7 +210,7 @@ class AgentQueries {
         }
         
         // Order
-        $allowed_orderby = array('id', 'first_name', 'last_name', 'email', 'created_at', 'updated_at');
+        $allowed_orderby = array('agent_id', 'first_name', 'surname', 'email_address', 'created_at', 'updated_at');
         $orderby = in_array($args['orderby'], $allowed_orderby) ? $args['orderby'] : 'created_at';
         $order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
         $sql .= " ORDER BY $orderby $order";
@@ -234,11 +224,8 @@ class AgentQueries {
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            return $result ? $result->fetchAll() : array();
-        } else {
-            return $result ?: array();
-        }
+        // PostgreSQL-only result handling
+        return $result ? $result->fetchAll() : array();
     }
 
     /**
@@ -251,7 +238,7 @@ class AgentQueries {
      */
     public function update_agent($agent_id, $data) {
         // Remove fields that shouldn't be updated
-        unset($data['id']);
+        unset($data['agent_id']);
         unset($data['created_at']);
         unset($data['created_by']);
         
@@ -266,7 +253,7 @@ class AgentQueries {
         $result = $this->db->update(
             $this->get_table('agents'),
             $clean_data,
-            array('id' => $agent_id)
+            array('agent_id' => $agent_id)
         );
         
         return $result !== false;
@@ -299,7 +286,7 @@ class AgentQueries {
         // Delete agent
         $result = $this->db->delete(
             $this->get_table('agents'),
-            array('id' => $agent_id)
+            array('agent_id' => $agent_id)
         );
         
         return $result !== false;
@@ -338,8 +325,8 @@ class AgentQueries {
             $search = '%' . $args['search'] . '%';
             $sql .= " AND (
                 first_name LIKE :search1 OR 
-                last_name LIKE :search2 OR 
-                email LIKE :search3
+                surname LIKE :search2 OR 
+                email_address LIKE :search3
             )";
             $params['search1'] = $search;
             $params['search2'] = $search;
@@ -348,12 +335,9 @@ class AgentQueries {
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            $row = $result ? $result->fetch() : null;
-            return $row ? (int) $row['total'] : 0;
-        } else {
-            return !empty($result) ? (int) $result[0]['total'] : 0;
-        }
+        // PostgreSQL-only result handling
+        $row = $result ? $result->fetch() : null;
+        return $row ? (int) $row['total'] : 0;
     }
 
     /**
@@ -405,11 +389,8 @@ class AgentQueries {
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            $rows = $result ? $result->fetchAll() : array();
-        } else {
-            $rows = $result ?: array();
-        }
+        // PostgreSQL-only result handling
+        $rows = $result ? $result->fetchAll() : array();
         
         if (empty($rows)) {
             return $single ? null : array();
@@ -523,11 +504,8 @@ class AgentQueries {
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            return $result ? $result->fetchAll() : array();
-        } else {
-            return $result ?: array();
-        }
+        // PostgreSQL-only result handling
+        return $result ? $result->fetchAll() : array();
     }
 
     /**
@@ -600,11 +578,8 @@ class AgentQueries {
         
         $result = $this->db->query($sql, $params);
         
-        if ($this->db->get_db_type() === 'postgresql') {
-            return $result ? $result->fetchAll() : array();
-        } else {
-            return $result ?: array();
-        }
+        // PostgreSQL-only result handling
+        return $result ? $result->fetchAll() : array();
     }
 
     /**
@@ -632,36 +607,83 @@ class AgentQueries {
      */
     private function sanitize_agent_data($data) {
         $fields = array(
+            // Personal Information (database column names)
             'title' => 'sanitize_text_field',
             'first_name' => 'sanitize_text_field',
-            'last_name' => 'sanitize_text_field',
+            'second_name' => 'sanitize_text_field',  // Added missing field
+            'surname' => 'sanitize_text_field',  // Database column name
             'known_as' => 'sanitize_text_field',
+            'initials' => 'sanitize_text_field',
             'gender' => 'sanitize_text_field',
             'race' => 'sanitize_text_field',
-            'id_number' => 'sanitize_text_field',
+            
+            // Identification (database column names)
+            'id_type' => 'sanitize_text_field',
+            'sa_id_no' => 'sanitize_text_field',  // Database column name
             'passport_number' => 'sanitize_text_field',
-            'phone' => 'sanitize_text_field',
-            'email' => 'sanitize_email',
-            'street_address' => 'sanitize_textarea_field',
+            
+            // Contact Information (database column names)
+            'tel_number' => 'sanitize_text_field',  // Database column name
+            'email_address' => 'sanitize_email',  // Database column name
+            
+            // Address Information (database column names)
+            'residential_address_line' => 'sanitize_textarea_field',  // Database column name
+            'address_line_2' => 'sanitize_text_field',
             'city' => 'sanitize_text_field',
             'province' => 'sanitize_text_field',
-            'postal_code' => 'sanitize_text_field',
+            'residential_postal_code' => 'sanitize_text_field',  // Database column name
+            
+            // Working Areas (database column names)
+            'preferred_working_area_1' => 'absint',
+            'preferred_working_area_2' => 'absint',
+            'preferred_working_area_3' => 'absint',
+            
+            // SACE Registration (database column names)
             'sace_number' => 'sanitize_text_field',
+            'sace_registration_date' => 'sanitize_text_field',  // Added missing field
+            'sace_expiry_date' => 'sanitize_text_field',  // Added missing field
             'phase_registered' => 'sanitize_text_field',
             'subjects_registered' => 'sanitize_textarea_field',
+            
+            // Qualifications (database column names)
+            'highest_qualification' => 'sanitize_text_field',
+            
+            // Quantum Tests (database column names)
             'quantum_maths_passed' => 'absint',
             'quantum_science_passed' => 'absint',
+            'quantum_assessment' => 'absint',  // Fixed spelling and changed to absint for numbers
+            
+            // Criminal Record (database column names)
             'criminal_record_checked' => 'absint',
             'criminal_record_date' => 'sanitize_text_field',
+            'criminal_record_file' => 'sanitize_text_field',
+            
+            // Agreement (database column names)
             'signed_agreement' => 'absint',
-            'agreement_file_path' => 'sanitize_text_field',
+            'signed_agreement_date' => 'sanitize_text_field',
+            'signed_agreement_file' => 'sanitize_text_field',  // Database column name
+            
+            // Banking Details (database column names)
             'bank_name' => 'sanitize_text_field',
             'account_holder' => 'sanitize_text_field',
-            'account_number' => 'sanitize_text_field',
-            'branch_code' => 'sanitize_text_field',
+            'bank_account_number' => 'sanitize_text_field',  // Database column name
+            'bank_branch_code' => 'sanitize_text_field',  // Database column name
             'account_type' => 'sanitize_text_field',
-            'preferred_areas' => 'sanitize_textarea_field',
+            
+            // Training (database column names)
+            'agent_training_date' => 'sanitize_text_field',
+            
+            // Metadata (database column names)
+            'agent_notes' => 'sanitize_textarea_field',  // Database column name
             'status' => 'sanitize_text_field',
+            'created_at' => 'sanitize_text_field',
+            'updated_at' => 'sanitize_text_field',
+            'created_by' => 'absint',
+            'updated_by' => 'absint',
+            
+            // Legacy fields
+            'residential_suburb' => 'sanitize_text_field',
+            'residential_town_id' => 'absint',
         );
         
         $clean_data = array();

@@ -371,15 +371,15 @@ class AgentCaptureForm {
      * @since 1.0.0
      */
     protected function validate_unique_email() {
-        if (empty($this->data['email'])) {
+        if (empty($this->data['email_address'])) {
             return;
         }
         
         $agent_queries = new \WeCoza\Agents\Database\AgentQueries();
-        $existing = $agent_queries->get_agent_by_email($this->data['email']);
+        $existing = $agent_queries->get_agent_by_email($this->data['email_address']);
         
-        if ($existing && (!$this->agent || $existing['id'] != $this->agent->id)) {
-            $this->errors['email'] = __('This email address is already registered.', 'wecoza-agents-plugin');
+        if ($existing && (!$this->agent || $existing['agent_id'] != $this->agent->id)) {
+            $this->errors['email_address'] = __('This email address is already registered.', 'wecoza-agents-plugin');
         }
     }
 
@@ -389,15 +389,15 @@ class AgentCaptureForm {
      * @since 1.0.0
      */
     protected function validate_unique_id_number() {
-        if (empty($this->data['id_number'])) {
+        if (empty($this->data['sa_id_no'])) {
             return;
         }
         
         $agent_queries = new \WeCoza\Agents\Database\AgentQueries();
-        $existing = $agent_queries->get_agent_by_id_number($this->data['id_number']);
+        $existing = $agent_queries->get_agent_by_id_number($this->data['sa_id_no']);
         
-        if ($existing && (!$this->agent || $existing['id'] != $this->agent->id)) {
-            $this->errors['id_number'] = __('This ID number is already registered.', 'wecoza-agents-plugin');
+        if ($existing && (!$this->agent || $existing['agent_id'] != $this->agent->id)) {
+            $this->errors['sa_id_no'] = __('This ID number is already registered.', 'wecoza-agents-plugin');
         }
     }
 
@@ -427,23 +427,36 @@ class AgentCaptureForm {
      */
     protected function handle_file_uploads($agent_id) {
         $upload_fields = array(
-            'signed_agreement_file' => 'agreement_file_path',
+            'signed_agreement_file' => 'signed_agreement_file',
             'criminal_record_file' => 'criminal_record_file',
         );
         
-        foreach ($upload_fields as $field => $meta_key) {
+        $uploaded_files = array();
+        
+        foreach ($upload_fields as $field => $db_field) {
             if (!empty($_FILES[$field]['name'])) {
                 $file_path = $this->upload_file($field, $agent_id);
                 if ($file_path) {
-                    // Update agent with file path
-                    $agent_queries = new \WeCoza\Agents\Database\AgentQueries();
-                    if ($meta_key === 'agreement_file_path') {
-                        $agent_queries->update_agent($agent_id, array($meta_key => $file_path));
-                    } else {
-                        $agent_queries->add_agent_meta($agent_id, $meta_key, $file_path);
-                    }
+                    $uploaded_files[$db_field] = $file_path;
                 }
             }
+        }
+        
+        // Update agent with file paths
+        if (!empty($uploaded_files)) {
+            $agent_queries = new \WeCoza\Agents\Database\AgentQueries();
+            
+            // If we have criminal_record_file, update it directly
+            if (isset($uploaded_files['criminal_record_file'])) {
+                $agent_queries->update_agent($agent_id, array(
+                    'criminal_record_file' => $uploaded_files['criminal_record_file']
+                ));
+            }
+            
+            // Store all uploaded files in the latest_document JSON column
+            $agent_queries->update_agent($agent_id, array(
+                'latest_document' => json_encode($uploaded_files)
+            ));
         }
     }
 
@@ -467,17 +480,17 @@ class AgentCaptureForm {
         
         // Create upload directory
         $upload_dir = wp_upload_dir();
-        $agent_dir = $upload_dir['basedir'] . '/wecoza-agents/agent-' . $agent_id;
+        $agents_dir = $upload_dir['basedir'] . '/agents';
         
-        if (!file_exists($agent_dir)) {
-            wp_mkdir_p($agent_dir);
+        if (!file_exists($agents_dir)) {
+            wp_mkdir_p($agents_dir);
         }
         
-        // Generate unique filename
+        // Generate unique filename with agent ID prefix
         $filename = sanitize_file_name(
-            $field_name . '-' . time() . '.' . pathinfo($file['name'], PATHINFO_EXTENSION)
+            'agent-' . $agent_id . '-' . $field_name . '-' . time() . '.' . pathinfo($file['name'], PATHINFO_EXTENSION)
         );
-        $file_path = $agent_dir . '/' . $filename;
+        $file_path = $agents_dir . '/' . $filename;
         
         // Move uploaded file
         if (move_uploaded_file($file['tmp_name'], $file_path)) {

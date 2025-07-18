@@ -99,36 +99,13 @@ class Activator {
         
         $charset_collate = $wpdb->get_charset_collate();
         
-        // Get database type
-        $db_type = self::get_database_type();
-        
-        if ($db_type === 'postgresql') {
-            self::create_postgresql_tables();
-        } else {
-            self::create_mysql_tables($charset_collate);
-        }
+        // Create PostgreSQL tables (required)
+        self::create_postgresql_tables();
         
         // Update database version
         update_option(WECOZA_AGENTS_DB_VERSION_OPTION, WECOZA_AGENTS_DB_VERSION);
     }
 
-    /**
-     * Get database type
-     *
-     * @since 1.0.0
-     * @return string 'postgresql' or 'mysql'
-     */
-    private static function get_database_type() {
-        // Check if PostgreSQL settings exist
-        $pg_host = get_option('wecoza_postgres_host');
-        $pg_pass = get_option('wecoza_postgres_password');
-        
-        if ($pg_host && $pg_pass) {
-            return 'postgresql';
-        }
-        
-        return 'mysql';
-    }
 
     /**
      * Create PostgreSQL tables
@@ -219,108 +196,6 @@ class Activator {
         self::execute_postgresql_query($sql);
     }
 
-    /**
-     * Create MySQL tables
-     *
-     * @since 1.0.0
-     * @param string $charset_collate Character set and collation
-     */
-    private static function create_mysql_tables($charset_collate) {
-        global $wpdb;
-        
-        // Agents table
-        $agents_table = $wpdb->prefix . 'wecoza_agents';
-        $agents_sql = "CREATE TABLE IF NOT EXISTS $agents_table (
-            id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            title VARCHAR(50),
-            first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NOT NULL,
-            known_as VARCHAR(255),
-            gender VARCHAR(20),
-            race VARCHAR(50),
-            id_number VARCHAR(20),
-            passport_number VARCHAR(50),
-            phone VARCHAR(50) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            street_address TEXT,
-            city VARCHAR(255),
-            province VARCHAR(255),
-            postal_code VARCHAR(20),
-            sace_number VARCHAR(100),
-            phase_registered VARCHAR(100),
-            subjects_registered TEXT,
-            quantum_maths_passed TINYINT(1) DEFAULT 0,
-            quantum_science_passed TINYINT(1) DEFAULT 0,
-            criminal_record_checked TINYINT(1) DEFAULT 0,
-            criminal_record_date DATE,
-            signed_agreement TINYINT(1) DEFAULT 0,
-            agreement_file_path VARCHAR(500),
-            bank_name VARCHAR(255),
-            account_holder VARCHAR(255),
-            account_number VARCHAR(50),
-            branch_code VARCHAR(20),
-            account_type VARCHAR(50),
-            preferred_areas TEXT,
-            status VARCHAR(50) DEFAULT 'active',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            created_by INT(11),
-            updated_by INT(11),
-            PRIMARY KEY (id),
-            UNIQUE KEY email_unique (email),
-            UNIQUE KEY id_number_unique (id_number),
-            KEY idx_status (status),
-            KEY idx_created_at (created_at)
-        ) $charset_collate;";
-
-        // Agent meta table
-        $agent_meta_table = $wpdb->prefix . 'wecoza_agent_meta';
-        $agent_meta_sql = "CREATE TABLE IF NOT EXISTS $agent_meta_table (
-            id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            agent_id INT(11) UNSIGNED NOT NULL,
-            meta_key VARCHAR(255) NOT NULL,
-            meta_value LONGTEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            UNIQUE KEY agent_meta_unique (agent_id, meta_key),
-            KEY idx_agent_id (agent_id)
-        ) $charset_collate;";
-
-        // Agent notes table
-        $agent_notes_table = $wpdb->prefix . 'wecoza_agent_notes';
-        $agent_notes_sql = "CREATE TABLE IF NOT EXISTS $agent_notes_table (
-            id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            agent_id INT(11) UNSIGNED NOT NULL,
-            note TEXT NOT NULL,
-            note_type VARCHAR(50),
-            created_by INT(11),
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY idx_agent_id (agent_id),
-            KEY idx_created_at (created_at)
-        ) $charset_collate;";
-
-        // Agent absences table
-        $agent_absences_table = $wpdb->prefix . 'wecoza_agent_absences';
-        $agent_absences_sql = "CREATE TABLE IF NOT EXISTS $agent_absences_table (
-            id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-            agent_id INT(11) UNSIGNED NOT NULL,
-            absence_date DATE NOT NULL,
-            reason TEXT,
-            created_by INT(11),
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY idx_agent_id (agent_id),
-            KEY idx_absence_date (absence_date)
-        ) $charset_collate;";
-
-        // Execute queries
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($agents_sql);
-        dbDelta($agent_meta_sql);
-        dbDelta($agent_notes_sql);
-        dbDelta($agent_absences_sql);
-    }
 
     /**
      * Execute PostgreSQL query
@@ -348,8 +223,16 @@ class Activator {
             
         } catch (\Exception $e) {
             error_log('WeCoza Agents: PostgreSQL table creation failed - ' . $e->getMessage());
-            // Fall back to MySQL
-            self::create_mysql_tables($GLOBALS['wpdb']->get_charset_collate());
+            // Fail activation if PostgreSQL is not available
+            deactivate_plugins(plugin_basename(WECOZA_AGENTS_PLUGIN_FILE));
+            wp_die(
+                sprintf(
+                    __('WeCoza Agents Plugin requires PostgreSQL connection. Error: %s', 'wecoza-agents-plugin'),
+                    $e->getMessage()
+                ),
+                __('Plugin Activation Error', 'wecoza-agents-plugin'),
+                array('back_link' => true)
+            );
         }
     }
 

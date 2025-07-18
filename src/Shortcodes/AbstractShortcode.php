@@ -562,7 +562,7 @@ abstract class AbstractShortcode {
      * @param string $message Success message
      */
     protected function add_success_message($message) {
-        echo '<div class="alert alert-success alert-dismissible fade show wecoza-agents-notification">';
+        echo '<div class="alert alert-subtle-success alert-dismissible fade show wecoza-agents-notification">';
         echo '<i class="fa-solid fa-circle-check icon-success"></i> ';
         echo esc_html($message);
         echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
@@ -576,7 +576,7 @@ abstract class AbstractShortcode {
      * @param string $message Error message
      */
     protected function add_error_message($message) {
-        echo '<div class="alert alert-danger alert-dismissible fade show wecoza-agents-notification">';
+        echo '<div class="alert alert-subtle-danger alert-dismissible fade show wecoza-agents-notification">';
         echo '<i class="fa-solid fa-circle-exclamation icon-danger"></i> ';
         echo esc_html($message);
         echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';

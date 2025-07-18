@@ -47,12 +47,6 @@ class DatabaseService {
      */
     private $wpdb = null;
 
-    /**
-     * Database type
-     *
-     * @var string 'postgresql' or 'mysql'
-     */
-    private $db_type = 'mysql';
 
     /**
      * Connection status
@@ -82,15 +76,11 @@ class DatabaseService {
             $this->logger = new DatabaseLogger();
         }
         
-        // Attempt PostgreSQL connection first
-        if ($this->connect_postgresql()) {
-            $this->db_type = 'postgresql';
-            $this->connected = true;
-        } else {
-            // Fall back to MySQL/WordPress database
-            $this->db_type = 'mysql';
-            $this->connected = true; // WordPress database is always available
+        // Connect to PostgreSQL (required)
+        if (!$this->connect_postgresql()) {
+            throw new Exception('PostgreSQL connection is required but failed. Please check your PostgreSQL credentials.');
         }
+        $this->connected = true;
     }
 
     /**
@@ -171,10 +161,10 @@ class DatabaseService {
      * Get database type
      *
      * @since 1.0.0
-     * @return string 'postgresql' or 'mysql'
+     * @return string Always returns 'postgresql'
      */
     public function get_db_type() {
-        return $this->db_type;
+        return 'postgresql';
     }
 
     /**
@@ -219,25 +209,16 @@ class DatabaseService {
         $start_time = microtime(true);
         
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                // PostgreSQL query
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute($params);
-                
-                $this->log_query($sql, $params, microtime(true) - $start_time);
-                return $stmt;
-                
-            } else {
-                // MySQL/WordPress query
-                if (!empty($params)) {
-                    $sql = $this->wpdb->prepare($sql, $params);
-                }
-                
-                $results = $this->wpdb->get_results($sql, ARRAY_A);
-                
-                $this->log_query($sql, $params, microtime(true) - $start_time);
-                return $results;
+            // PostgreSQL query only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            
+            $this->log_query($sql, $params, microtime(true) - $start_time);
+            return $stmt;
             
         } catch (Exception $e) {
             $this->log('error', 'Query error: ' . $e->getMessage(), array(
@@ -260,41 +241,32 @@ class DatabaseService {
         $start_time = microtime(true);
         
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                // PostgreSQL insert
-                $fields = array_keys($data);
-                $values = array_map(function($field) { return ':' . $field; }, $fields);
-                
-                $sql = sprintf(
-                    'INSERT INTO %s (%s) VALUES (%s) RETURNING id',
-                    $table,
-                    implode(', ', $fields),
-                    implode(', ', $values)
-                );
-                
-                $stmt = $this->pdo->prepare($sql);
-                
-                foreach ($data as $field => $value) {
-                    $stmt->bindValue(':' . $field, $value);
-                }
-                
-                $stmt->execute();
-                $result = $stmt->fetch();
-                
-                $this->log_query($sql, $data, microtime(true) - $start_time);
-                return $result['id'] ?? false;
-                
-            } else {
-                // MySQL/WordPress insert
-                $result = $this->wpdb->insert($table, $data);
-                
-                if ($result !== false) {
-                    $this->log_query("INSERT INTO $table", $data, microtime(true) - $start_time);
-                    return $this->wpdb->insert_id;
-                }
-                
-                return false;
+            // PostgreSQL insert only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            
+            $fields = array_keys($data);
+            $values = array_map(function($field) { return ':' . $field; }, $fields);
+            
+            $sql = sprintf(
+                'INSERT INTO %s (%s) VALUES (%s) RETURNING agent_id',
+                $table,
+                implode(', ', $fields),
+                implode(', ', $values)
+            );
+            
+            $stmt = $this->pdo->prepare($sql);
+            
+            foreach ($data as $field => $value) {
+                $stmt->bindValue(':' . $field, $value);
+            }
+            
+            $stmt->execute();
+            $result = $stmt->fetch();
+            
+            $this->log_query($sql, $data, microtime(true) - $start_time);
+            return $result['agent_id'] ?? false;
             
         } catch (Exception $e) {
             $this->log('error', 'Insert error: ' . $e->getMessage(), array(
@@ -318,42 +290,37 @@ class DatabaseService {
         $start_time = microtime(true);
         
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                // PostgreSQL update
-                $set_parts = array();
-                $where_parts = array();
-                $params = array();
-                
-                foreach ($data as $field => $value) {
-                    $set_parts[] = "$field = :set_$field";
-                    $params["set_$field"] = $value;
-                }
-                
-                foreach ($where as $field => $value) {
-                    $where_parts[] = "$field = :where_$field";
-                    $params["where_$field"] = $value;
-                }
-                
-                $sql = sprintf(
-                    'UPDATE %s SET %s WHERE %s',
-                    $table,
-                    implode(', ', $set_parts),
-                    implode(' AND ', $where_parts)
-                );
-                
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute($params);
-                
-                $this->log_query($sql, $params, microtime(true) - $start_time);
-                return $stmt->rowCount();
-                
-            } else {
-                // MySQL/WordPress update
-                $result = $this->wpdb->update($table, $data, $where);
-                
-                $this->log_query("UPDATE $table", array_merge($data, $where), microtime(true) - $start_time);
-                return $result;
+            // PostgreSQL update only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            
+            $set_parts = array();
+            $where_parts = array();
+            $params = array();
+            
+            foreach ($data as $field => $value) {
+                $set_parts[] = "$field = :set_$field";
+                $params["set_$field"] = $value;
+            }
+            
+            foreach ($where as $field => $value) {
+                $where_parts[] = "$field = :where_$field";
+                $params["where_$field"] = $value;
+            }
+            
+            $sql = sprintf(
+                'UPDATE %s SET %s WHERE %s',
+                $table,
+                implode(', ', $set_parts),
+                implode(' AND ', $where_parts)
+            );
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            
+            $this->log_query($sql, $params, microtime(true) - $start_time);
+            return $stmt->rowCount();
             
         } catch (Exception $e) {
             $this->log('error', 'Update error: ' . $e->getMessage(), array(
@@ -377,35 +344,30 @@ class DatabaseService {
         $start_time = microtime(true);
         
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                // PostgreSQL delete
-                $where_parts = array();
-                $params = array();
-                
-                foreach ($where as $field => $value) {
-                    $where_parts[] = "$field = :$field";
-                    $params[$field] = $value;
-                }
-                
-                $sql = sprintf(
-                    'DELETE FROM %s WHERE %s',
-                    $table,
-                    implode(' AND ', $where_parts)
-                );
-                
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute($params);
-                
-                $this->log_query($sql, $params, microtime(true) - $start_time);
-                return $stmt->rowCount();
-                
-            } else {
-                // MySQL/WordPress delete
-                $result = $this->wpdb->delete($table, $where);
-                
-                $this->log_query("DELETE FROM $table", $where, microtime(true) - $start_time);
-                return $result;
+            // PostgreSQL delete only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            
+            $where_parts = array();
+            $params = array();
+            
+            foreach ($where as $field => $value) {
+                $where_parts[] = "$field = :$field";
+                $params[$field] = $value;
+            }
+            
+            $sql = sprintf(
+                'DELETE FROM %s WHERE %s',
+                $table,
+                implode(' AND ', $where_parts)
+            );
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            
+            $this->log_query($sql, $params, microtime(true) - $start_time);
+            return $stmt->rowCount();
             
         } catch (Exception $e) {
             $this->log('error', 'Delete error: ' . $e->getMessage(), array(
@@ -424,13 +386,11 @@ class DatabaseService {
      */
     public function begin_transaction() {
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                return $this->pdo->beginTransaction();
-            } else {
-                // MySQL/WordPress doesn't support transactions in most cases
-                $this->wpdb->query('START TRANSACTION');
-                return true;
+            // PostgreSQL transaction only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            return $this->pdo->beginTransaction();
         } catch (Exception $e) {
             $this->log('error', 'Transaction begin error: ' . $e->getMessage());
             return false;
@@ -445,12 +405,11 @@ class DatabaseService {
      */
     public function commit() {
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                return $this->pdo->commit();
-            } else {
-                $this->wpdb->query('COMMIT');
-                return true;
+            // PostgreSQL transaction only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            return $this->pdo->commit();
         } catch (Exception $e) {
             $this->log('error', 'Transaction commit error: ' . $e->getMessage());
             return false;
@@ -465,12 +424,11 @@ class DatabaseService {
      */
     public function rollback() {
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                return $this->pdo->rollBack();
-            } else {
-                $this->wpdb->query('ROLLBACK');
-                return true;
+            // PostgreSQL transaction only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            return $this->pdo->rollBack();
         } catch (Exception $e) {
             $this->log('error', 'Transaction rollback error: ' . $e->getMessage());
             return false;
@@ -484,11 +442,10 @@ class DatabaseService {
      * @return bool
      */
     public function in_transaction() {
-        if ($this->db_type === 'postgresql' && $this->pdo) {
-            return $this->pdo->inTransaction();
+        if (!$this->pdo) {
+            return false;
         }
-        // WordPress doesn't provide transaction status
-        return false;
+        return $this->pdo->inTransaction();
     }
 
     /**
@@ -498,11 +455,10 @@ class DatabaseService {
      * @return string|int
      */
     public function last_insert_id() {
-        if ($this->db_type === 'postgresql' && $this->pdo) {
-            return $this->pdo->lastInsertId();
-        } else {
-            return $this->wpdb->insert_id;
+        if (!$this->pdo) {
+            throw new Exception('PostgreSQL connection not available');
         }
+        return $this->pdo->lastInsertId();
     }
 
     /**
@@ -513,11 +469,10 @@ class DatabaseService {
      * @return string
      */
     public function escape($string) {
-        if ($this->db_type === 'postgresql' && $this->pdo) {
-            return $this->pdo->quote($string);
-        } else {
-            return $this->wpdb->esc_like($string);
+        if (!$this->pdo) {
+            throw new Exception('PostgreSQL connection not available');
         }
+        return $this->pdo->quote($string);
     }
 
     /**
@@ -527,11 +482,7 @@ class DatabaseService {
      * @return string
      */
     public function get_table_prefix() {
-        if ($this->db_type === 'postgresql') {
-            return ''; // PostgreSQL uses schemas instead of prefixes
-        } else {
-            return $this->wpdb->prefix;
-        }
+        return ''; // PostgreSQL uses schemas instead of prefixes
     }
 
     /**
@@ -585,29 +536,23 @@ class DatabaseService {
     public function test_connection() {
         $results = array(
             'connected' => false,
-            'db_type' => $this->db_type,
+            'db_type' => 'postgresql',
             'message' => '',
             'details' => array()
         );
 
         try {
-            if ($this->db_type === 'postgresql' && $this->pdo) {
-                // Test PostgreSQL
-                $stmt = $this->pdo->query('SELECT version()');
-                $version = $stmt->fetchColumn();
-                
-                $results['connected'] = true;
-                $results['message'] = __('PostgreSQL connection successful', 'wecoza-agents-plugin');
-                $results['details']['version'] = $version;
-                
-            } else {
-                // Test MySQL/WordPress
-                $version = $this->wpdb->get_var('SELECT VERSION()');
-                
-                $results['connected'] = true;
-                $results['message'] = __('MySQL connection successful', 'wecoza-agents-plugin');
-                $results['details']['version'] = $version;
+            // Test PostgreSQL only
+            if (!$this->pdo) {
+                throw new Exception('PostgreSQL connection not available');
             }
+            
+            $stmt = $this->pdo->query('SELECT version()');
+            $version = $stmt->fetchColumn();
+            
+            $results['connected'] = true;
+            $results['message'] = __('PostgreSQL connection successful', 'wecoza-agents-plugin');
+            $results['details']['version'] = $version;
             
         } catch (Exception $e) {
             $results['message'] = $e->getMessage();

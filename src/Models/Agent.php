@@ -23,11 +23,18 @@ if (!defined('ABSPATH')) {
 class Agent {
 
     /**
-     * Agent ID
+     * Agent ID (maps to 'agent_id' in database)
      *
      * @var int
      */
     protected $id = 0;
+    
+    /**
+     * Database primary key field name
+     *
+     * @var string
+     */
+    protected static $primary_key = 'agent_id';
 
     /**
      * Agent data
@@ -52,111 +59,121 @@ class Agent {
 
     /**
      * Default agent data structure
+     * Uses actual database column names
      *
      * @var array
      */
     protected static $defaults = array(
-        // Personal Information
+        // Personal Information (matches database)
         'title' => '',
         'first_name' => '',
-        'last_name' => '',
+        'second_name' => '',  // New field added
+        'surname' => '',  // Database column name
         'known_as' => '',
         'initials' => '',
         'gender' => '',
         'race' => '',
         
-        // Identification
+        // Identification (matches database)
         'id_type' => 'sa_id', // sa_id or passport
-        'id_number' => '',
+        'sa_id_no' => '',  // Database column name
         'passport_number' => '',
         
-        // Contact Information
-        'phone' => '',
-        'email' => '',
-        'street_address' => '',
-        'city' => '',
-        'province' => '',
-        'postal_code' => '',
+        // Contact Information (matches database)
+        'tel_number' => '',  // Database column name
+        'email_address' => '',  // Database column name
         
-        // SACE Registration
-        'sace_number' => '',
+        // Address Information (matches database)
+        'residential_address_line' => '',  // Database column name
+        'address_line_2' => '',  // New column added
+        'city' => '',  // New column added
+        'province' => '',  // New column added
+        'residential_postal_code' => '',  // Database column name
+        
+        // Working Areas (matches database)
+        'preferred_working_area_1' => null,  // Database column name
+        'preferred_working_area_2' => null,  // Database column name
+        'preferred_working_area_3' => null,  // Database column name
+        
+        // SACE Registration (matches database)
+        'sace_number' => '',  // Renamed from sace_registration_number
+        'sace_registration_date' => '',  // New field added
+        'sace_expiry_date' => '',  // New field added
         'phase_registered' => '',
         'subjects_registered' => '',
         
-        // Qualifications
+        // Qualifications (matches database)
         'highest_qualification' => '',
         
-        // Quantum Tests
-        'quantum_maths_passed' => false,
-        'quantum_science_passed' => false,
-        'quantum_communications' => '',
-        'quantum_mathematics' => '',
-        'quantum_training' => '',
+        // Quantum Tests (matches database)
+        'quantum_maths_passed' => false,  // New column added
+        'quantum_science_passed' => false,  // New column added
+        'quantum_assessment' => '',  // Fixed typo from quantum_assesment
         
-        // Criminal Record
-        'criminal_record_checked' => false,
-        'criminal_record_date' => '',
-        'criminal_record_file' => '',
+        // Criminal Record (matches database)
+        'criminal_record_checked' => false,  // New column added
+        'criminal_record_date' => '',  // New column added
+        'criminal_record_file' => '',  // New column added
         
-        // Agreement
+        // Agreement (matches database)
         'signed_agreement' => false,
         'signed_agreement_date' => '',
-        'agreement_file_path' => '',
+        'signed_agreement_file' => '',  // Database column name
         
-        // Banking Details
+        // Banking Details (matches database)
         'bank_name' => '',
-        'account_holder' => '',
-        'account_number' => '',
-        'branch_code' => '',
-        'account_type' => '',
+        'account_holder' => '',  // New column added
+        'bank_account_number' => '',  // Database column name
+        'bank_branch_code' => '',  // Database column name
+        'account_type' => '',  // New column added
         
-        // Working Areas
-        'preferred_areas' => '', // JSON encoded array
-        
-        // Training
+        // Training (matches database)
         'agent_training_date' => '',
         
-        // Metadata
-        'date_loaded' => '',
+        // Metadata (matches database)
+        'agent_notes' => '',  // Database column name
         'created_at' => '',
         'updated_at' => '',
-        'created_by' => 0,
-        'updated_by' => 0,
-        'status' => 'active', // active, inactive, suspended
-        'notes' => '',
+        'created_by' => 0,  // New column added
+        'updated_by' => 0,  // New column added
+        'status' => 'active',  // New column added
+        
+        // Legacy fields for backward compatibility
+        'residential_suburb' => '',  // Database column name
+        'residential_town_id' => null,  // Database column name
     );
 
     /**
-     * Required fields
+     * Required fields (using database column names)
      *
      * @var array
      */
     protected static $required_fields = array(
         'first_name',
-        'last_name',
+        'surname',  // Database column name
         'gender',
         'race',
-        'phone',
-        'email',
-        'street_address',
-        'city',
-        'province',
-        'postal_code',
+        'tel_number',  // Database column name
+        'email_address',  // Database column name
+        'residential_address_line',  // Database column name
+        'city',  // New column
+        'province',  // New column
+        'residential_postal_code',  // Database column name
     );
 
     /**
-     * Validation rules
+     * Validation rules (using database column names)
      *
      * @var array
      */
     protected static $validation_rules = array(
-        'email' => 'email',
-        'phone' => 'phone',
-        'id_number' => 'sa_id',
+        'email_address' => 'email',  // Database column name
+        'tel_number' => 'phone',  // Database column name
+        'sa_id_no' => 'sa_id',  // Database column name
         'passport_number' => 'passport',
-        'postal_code' => 'numeric',
-        'bank_account_number' => 'numeric',
-        'branch_code' => 'numeric',
+        'residential_postal_code' => 'numeric',  // Database column name
+        'bank_account_number' => 'numeric',  // Database column name
+        'bank_branch_code' => 'numeric',  // Database column name
     );
 
     /**
@@ -293,6 +310,11 @@ class Agent {
         
         // Remove fields that shouldn't be saved directly
         unset($data['id']);
+        
+        // Handle primary key mapping
+        if ($this->id) {
+            $data[self::$primary_key] = $this->id;
+        }
         
         // Set timestamps
         if (!$this->id) {
@@ -443,19 +465,22 @@ class Agent {
             }
         }
         
-        // Validate email
-        if (!empty($data['email']) && !is_email($data['email'])) {
-            $this->errors['email'] = __('Please enter a valid email address.', 'wecoza-agents-plugin');
+        // Validate email (using database column name)
+        if (!empty($data['email_address']) && !is_email($data['email_address'])) {
+            $this->errors['email_address'] = __('Please enter a valid email address.', 'wecoza-agents-plugin');
         }
         
         // Validate ID number or passport based on type
         if ($data['id_type'] === 'sa_id') {
-            if (empty($data['id_number'])) {
-                $this->errors['id_number'] = __('SA ID number is required.', 'wecoza-agents-plugin');
+            if (empty($data['sa_id_no'])) {
+                $this->errors['sa_id_no'] = __('SA ID number is required.', 'wecoza-agents-plugin');
             } else {
-                $validation = \WeCoza\Agents\Helpers\ValidationHelper::validate_sa_id($data['id_number']);
-                if (!$validation['valid']) {
-                    $this->errors['id_number'] = $validation['message'];
+                // Validate SA ID format and checksum
+                $validation = \WeCoza\Agents\Helpers\ValidationHelper::validate_sa_id($data['sa_id_no']);
+                if (is_array($validation) && !$validation['valid']) {
+                    $this->errors['sa_id_no'] = $validation['message'];
+                } elseif (is_bool($validation) && !$validation) {
+                    $this->errors['sa_id_no'] = __('SA ID number is invalid.', 'wecoza-agents-plugin');
                 }
             }
         } else {
@@ -463,23 +488,25 @@ class Agent {
                 $this->errors['passport_number'] = __('Passport number is required.', 'wecoza-agents-plugin');
             } else {
                 $validation = \WeCoza\Agents\Helpers\ValidationHelper::validate_passport($data['passport_number']);
-                if (!$validation['valid']) {
+                if (is_array($validation) && !$validation['valid']) {
                     $this->errors['passport_number'] = $validation['message'];
+                } elseif (is_bool($validation) && !$validation) {
+                    $this->errors['passport_number'] = __('Passport number is invalid.', 'wecoza-agents-plugin');
                 }
             }
         }
         
-        // Validate phone number format
-        if (!empty($data['phone'])) {
-            $phone = preg_replace('/[^0-9]/', '', $data['phone']);
+        // Validate phone number format (using database column name)
+        if (!empty($data['tel_number'])) {
+            $phone = preg_replace('/[^0-9]/', '', $data['tel_number']);
             if (strlen($phone) < 10) {
-                $this->errors['phone'] = __('Please enter a valid phone number.', 'wecoza-agents-plugin');
+                $this->errors['tel_number'] = __('Please enter a valid phone number.', 'wecoza-agents-plugin');
             }
         }
         
-        // Validate postal code
-        if (!empty($data['postal_code']) && !is_numeric($data['postal_code'])) {
-            $this->errors['postal_code'] = __('Postal code must be numeric.', 'wecoza-agents-plugin');
+        // Validate postal code (using database column name)
+        if (!empty($data['residential_postal_code']) && !is_numeric($data['residential_postal_code'])) {
+            $this->errors['residential_postal_code'] = __('Postal code must be numeric.', 'wecoza-agents-plugin');
         }
         
         // Validate bank details if provided
@@ -511,6 +538,74 @@ class Agent {
         $this->errors = apply_filters('wecoza_agents_validate_agent', $this->errors, $data, $this);
         
         return empty($this->errors);
+    }
+    
+    /**
+     * Get field value using FormHelpers mapping
+     *
+     * @since 1.0.0
+     * @param string $form_field_name Form field name
+     * @param mixed $default Default value
+     * @return mixed Field value
+     */
+    public function get_form_field($form_field_name, $default = null) {
+        // Use FormHelpers to map form field to database field
+        if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
+            $db_field = \WeCoza\Agents\Helpers\FormHelpers::get_database_field_name($form_field_name);
+            return $this->get($db_field, $default);
+        }
+        
+        return $this->get($form_field_name, $default);
+    }
+    
+    /**
+     * Set field value using FormHelpers mapping
+     *
+     * @since 1.0.0
+     * @param string $form_field_name Form field name
+     * @param mixed $value Field value
+     */
+    public function set_form_field($form_field_name, $value) {
+        // Use FormHelpers to map form field to database field
+        if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
+            $db_field = \WeCoza\Agents\Helpers\FormHelpers::get_database_field_name($form_field_name);
+            $this->set($db_field, $value);
+        } else {
+            $this->set($form_field_name, $value);
+        }
+    }
+    
+    /**
+     * Set data from form submission
+     *
+     * @since 1.0.0
+     * @param array $form_data Form data with form field names
+     */
+    public function set_form_data($form_data) {
+        // Use FormHelpers to map form fields to database fields
+        if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
+            $db_data = \WeCoza\Agents\Helpers\FormHelpers::map_form_to_database($form_data);
+            $this->set_data($db_data);
+        } else {
+            $this->set_data($form_data);
+        }
+    }
+    
+    /**
+     * Get data in form format
+     *
+     * @since 1.0.0
+     * @return array Data with form field names
+     */
+    public function get_form_data() {
+        $data = $this->get_data();
+        
+        // Use FormHelpers to map database fields to form fields
+        if (class_exists('\WeCoza\Agents\Helpers\FormHelpers')) {
+            return \WeCoza\Agents\Helpers\FormHelpers::map_database_to_form($data);
+        }
+        
+        return $data;
     }
 
     /**
@@ -560,8 +655,8 @@ class Agent {
             $parts[] = '(' . $this->get('known_as') . ')';
         }
         
-        if ($this->get('last_name')) {
-            $parts[] = $this->get('last_name');
+        if ($this->get('surname')) {
+            $parts[] = $this->get('surname');
         }
         
         return implode(' ', $parts);
@@ -584,8 +679,8 @@ class Agent {
             $initials .= strtoupper(substr($this->get('first_name'), 0, 1)) . '.';
         }
         
-        if ($this->get('last_name')) {
-            $initials .= ' ' . strtoupper(substr($this->get('last_name'), 0, 1)) . '.';
+        if ($this->get('surname')) {
+            $initials .= ' ' . strtoupper(substr($this->get('surname'), 0, 1)) . '.';
         }
         
         return trim($initials);
@@ -598,14 +693,20 @@ class Agent {
      * @return array Preferred areas
      */
     public function get_preferred_areas() {
-        $areas = $this->get('preferred_areas');
+        $areas = array();
         
-        if (is_string($areas)) {
-            $decoded = json_decode($areas, true);
-            return is_array($decoded) ? $decoded : array();
+        // Get from individual database columns
+        if ($this->get('preferred_working_area_1')) {
+            $areas[] = $this->get('preferred_working_area_1');
+        }
+        if ($this->get('preferred_working_area_2')) {
+            $areas[] = $this->get('preferred_working_area_2');
+        }
+        if ($this->get('preferred_working_area_3')) {
+            $areas[] = $this->get('preferred_working_area_3');
         }
         
-        return is_array($areas) ? $areas : array();
+        return $areas;
     }
 
     /**
@@ -616,7 +717,10 @@ class Agent {
      */
     public function set_preferred_areas($areas) {
         if (is_array($areas)) {
-            $this->set('preferred_areas', json_encode(array_values($areas)));
+            // Set individual database columns
+            $this->set('preferred_working_area_1', isset($areas[0]) ? $areas[0] : null);
+            $this->set('preferred_working_area_2', isset($areas[1]) ? $areas[1] : null);
+            $this->set('preferred_working_area_3', isset($areas[2]) ? $areas[2] : null);
         }
     }
 
@@ -686,6 +790,7 @@ class Agent {
     public function to_array() {
         $data = $this->get_data();
         $data['id'] = $this->id;
+        $data[self::$primary_key] = $this->id;
         return $data;
     }
 

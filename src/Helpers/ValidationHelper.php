@@ -253,15 +253,50 @@ class ValidationHelper {
      *
      * @since 1.0.0
      * @param string $value SA ID number
-     * @return bool Whether ID is valid
+     * @return array|bool Validation result array or boolean for compatibility
      */
     public static function validate_sa_id($value) {
         if (empty($value)) {
-            return true;
+            return array('valid' => true, 'message' => '');
         }
         
-        $result = wecoza_agents_validate_sa_id($value);
-        return $result['valid'];
+        // Check if global validation function exists
+        if (function_exists('wecoza_agents_validate_sa_id')) {
+            return wecoza_agents_validate_sa_id($value);
+        }
+        
+        // Fallback validation - SA ID must be 13 digits
+        if (!preg_match('/^[0-9]{13}$/', $value)) {
+            return array(
+                'valid' => false,
+                'message' => __('SA ID number must be 13 digits.', 'wecoza-agents-plugin')
+            );
+        }
+        
+        // Basic checksum validation for SA ID
+        $checksum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $digit = intval($value[$i]);
+            if ($i % 2 === 0) {
+                $checksum += $digit;
+            } else {
+                $doubled = $digit * 2;
+                // Sum the digits of the doubled value (e.g., 14 becomes 1 + 4 = 5)
+                $checksum += ($doubled >= 10) ? (1 + ($doubled % 10)) : $doubled;
+            }
+        }
+        
+        $calculatedChecksum = (10 - ($checksum % 10)) % 10;
+        $actualChecksum = intval($value[12]);
+        
+        if ($calculatedChecksum !== $actualChecksum) {
+            return array(
+                'valid' => false,
+                'message' => __('SA ID number checksum is invalid.', 'wecoza-agents-plugin')
+            );
+        }
+        
+        return array('valid' => true, 'message' => '');
     }
 
     /**
@@ -269,15 +304,27 @@ class ValidationHelper {
      *
      * @since 1.0.0
      * @param string $value Passport number
-     * @return bool Whether passport is valid
+     * @return array|bool Validation result array or boolean for compatibility
      */
     public static function validate_passport($value) {
         if (empty($value)) {
-            return true;
+            return array('valid' => true, 'message' => '');
         }
         
-        $result = wecoza_agents_validate_passport($value);
-        return $result['valid'];
+        // Check if global validation function exists
+        if (function_exists('wecoza_agents_validate_passport')) {
+            return wecoza_agents_validate_passport($value);
+        }
+        
+        // Fallback validation - passport should be 6-12 alphanumeric characters
+        if (!preg_match('/^[A-Z0-9]{6,12}$/', strtoupper($value))) {
+            return array(
+                'valid' => false,
+                'message' => __('Passport number must be 6-12 alphanumeric characters.', 'wecoza-agents-plugin')
+            );
+        }
+        
+        return array('valid' => true, 'message' => '');
     }
 
     /**
