@@ -265,11 +265,9 @@ class CaptureAgentShortcode extends AbstractShortcode {
             'agent_training_date' => $this->process_date_field($this->get_request_param('agent_training_date', '', 'POST')),
             
             // Criminal Record
-            'criminal_record_checked' => (bool) $this->get_request_param('criminal_record_checked', false, 'POST'),
             'criminal_record_date' => $this->process_date_field($this->get_request_param('criminal_record_date', '', 'POST')),
             
             // Agreement
-            'signed_agreement' => (bool) $this->get_request_param('signed_agreement', false, 'POST'),
             'signed_agreement_date' => $this->process_date_field($this->get_request_param('signed_agreement_date', '', 'POST')),
             
             // Banking Details - Using DB field names

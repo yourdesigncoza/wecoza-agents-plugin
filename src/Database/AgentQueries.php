@@ -653,12 +653,10 @@ class AgentQueries {
             'quantum_assessment' => 'absint',  // Fixed spelling and changed to absint for numbers
             
             // Criminal Record (database column names)
-            'criminal_record_checked' => 'absint',
             'criminal_record_date' => 'sanitize_text_field',
             'criminal_record_file' => 'sanitize_text_field',
             
             // Agreement (database column names)
-            'signed_agreement' => 'absint',
             'signed_agreement_date' => 'sanitize_text_field',
             'signed_agreement_file' => 'sanitize_text_field',  // Database column name
             

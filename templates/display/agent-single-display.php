@@ -386,34 +386,6 @@ if (!defined('ABSPATH')) {
                                 </td>
                             </tr>
                             
-                            <tr>
-                                <td class="py-2">
-                                    <div class="d-flex align-items-center">
-                                        <div class="d-flex bg-warning-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
-                                            <i class="bi bi-file-earmark-text text-warning" style="font-size: 12px;"></i>
-                                        </div>
-                                        <p class="fw-bold mb-0"><?php esc_html_e('Agreement :', 'wecoza-agents-plugin'); ?></p>
-                                    </div>
-                                </td>
-                                <td class="py-2">
-                                    <div class="fw-semibold mb-0">
-                                        <?php if ($agent['signed_agreement']) : ?>
-                                            <span class="text-success">
-                                                <i class="bi bi-check-circle me-1"></i><?php esc_html_e('Signed', 'wecoza-agents-plugin'); ?>
-                                            </span>
-                                            <?php if (!empty($agent['signed_agreement_date'])) : ?>
-                                                <div class="fs-9 text-muted mt-1">
-                                                    <?php echo esc_html(date_i18n($date_format, strtotime($agent['signed_agreement_date']))); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        <?php else : ?>
-                                            <span class="text-danger">
-                                                <i class="bi bi-x-circle me-1"></i><?php esc_html_e('Not Signed', 'wecoza-agents-plugin'); ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
                             
                             <tr>
                                 <td class="py-2">
@@ -440,34 +412,6 @@ if (!defined('ABSPATH')) {
                                 </td>
                             </tr>
                             
-                            <tr>
-                                <td class="py-2">
-                                    <div class="d-flex align-items-center">
-                                        <div class="d-flex bg-success-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
-                                            <i class="bi bi-shield-check text-success" style="font-size: 12px;"></i>
-                                        </div>
-                                        <p class="fw-bold mb-0"><?php esc_html_e('Criminal Record :', 'wecoza-agents-plugin'); ?></p>
-                                    </div>
-                                </td>
-                                <td class="py-2">
-                                    <div class="fw-semibold mb-0">
-                                        <?php if ($agent['criminal_record_checked']) : ?>
-                                            <span class="text-success">
-                                                <i class="bi bi-check-circle me-1"></i><?php esc_html_e('Checked', 'wecoza-agents-plugin'); ?>
-                                            </span>
-                                            <?php if (!empty($agent['criminal_record_date'])) : ?>
-                                                <div class="fs-9 text-muted mt-1">
-                                                    <?php echo esc_html(date_i18n($date_format, strtotime($agent['criminal_record_date']))); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        <?php else : ?>
-                                            <span class="text-danger">
-                                                <i class="bi bi-x-circle me-1"></i><?php esc_html_e('Pending', 'wecoza-agents-plugin'); ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
                             
                             <tr>
                                 <td class="py-2">

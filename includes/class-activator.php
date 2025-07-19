@@ -135,9 +135,7 @@ class Activator {
             subjects_registered TEXT,
             quantum_maths_score INT DEFAULT 0,
             quantum_science_score INT DEFAULT 0,
-            criminal_record_checked BOOLEAN DEFAULT FALSE,
             criminal_record_date DATE,
-            signed_agreement BOOLEAN DEFAULT FALSE,
             agreement_file_path VARCHAR(500),
             bank_name VARCHAR(255),
             account_holder VARCHAR(255),
@@ -259,14 +257,6 @@ class Activator {
         
         add_option(WECOZA_AGENTS_SETTINGS_OPTION, $default_settings);
         
-        // Database settings (if not already set)
-        if (!get_option('wecoza_postgres_host')) {
-            add_option('wecoza_postgres_host', '');
-            add_option('wecoza_postgres_port', '5432');
-            add_option('wecoza_postgres_dbname', '');
-            add_option('wecoza_postgres_user', '');
-            add_option('wecoza_postgres_password', '');
-        }
     }
 
     /**

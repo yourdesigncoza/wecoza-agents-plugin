@@ -22,7 +22,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
 ?>
 
-<form id="agents-form" class="ydcoza-compact-form needs-validation" method="POST" enctype="multipart/form-data" novalidate>
+<form id="agents-form" class="ydcoza-compact-form needs-validation mt-6" method="POST" enctype="multipart/form-data" novalidate>
     <?php wp_nonce_field('submit_agent_form', 'wecoza_agents_form_nonce'); ?>
     
     <!-- Agent ID (read-only if editing) -->
@@ -53,7 +53,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
         </div>
         
         <!-- First Name -->
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
             <input type="text" id="first_name" name="first_name" class="form-control form-control-sm <?php echo FormHelpers::get_error_class($errors, 'first_name'); ?>" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'first_name'); ?>" required>
@@ -62,7 +62,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
         </div>
         
         <!-- Second Name -->
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="second_name" class="form-label">Second Name</label>
             <input type="text" id="second_name" name="second_name" class="form-control form-control-sm <?php echo FormHelpers::get_error_class($errors, 'second_name'); ?>" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'second_name'); ?>">
@@ -70,23 +70,24 @@ use WeCoza\Agents\Helpers\FormHelpers;
         </div>
         
         <!-- Surname -->
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="surname" class="form-label">Surname <span class="text-danger">*</span></label>
             <input type="text" id="surname" name="surname" class="form-control form-control-sm <?php echo FormHelpers::get_error_class($errors, 'surname'); ?>" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'surname'); ?>" required>
             <div class="invalid-feedback">Please provide the surname.</div>
             <?php FormHelpers::display_field_error($errors, 'surname'); ?>
         </div>
-        
+    </div>
+    <div class="row mt-3">
         <!-- Initials -->
-        <div class="col-md-1">
-            <label for="initials" class="form-label">Initials <small>(Auto)</small></label>
+        <div class="col-md-2">
+            <label for="initiales" class="form-label">Initials <small>(Auto)</small></label>
             <input type="text" id="initials" name="initials" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'initials'); ?>" readonly>
         </div>
         
         <!-- Gender -->
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
             <select id="gender" name="gender" class="form-select form-select-sm <?php echo FormHelpers::get_error_class($errors, 'gender'); ?>" required>
                 <option value="">Select</option>
@@ -96,9 +97,6 @@ use WeCoza\Agents\Helpers\FormHelpers;
             <div class="invalid-feedback">Please select your gender.</div>
             <?php FormHelpers::display_field_error($errors, 'gender'); ?>
         </div>
-    </div>
-
-    <div class="row mt-3">
         <!-- Race -->
         <div class="col-md-3">
             <label for="race" class="form-label">Race <span class="text-danger">*</span></label>
@@ -118,7 +116,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
     <!-- Identification Section -->
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <!-- Radio buttons for ID or Passport selection -->
             <div class="mb-1">
                 <label class="form-label">Identification Type <span class="text-danger">*</span></label>
@@ -189,9 +187,31 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
     <div class="border-top border-opacity-25 border-3 border-discovery my-5 mx-1"></div>
 
+    <!-- SACE Registration Section -->
+    <div class="row">
+        <div class="col-md-3">
+            <label for="sace_number" class="form-label">SACE Registration Number</label>
+            <input type="text" id="sace_number" name="sace_number" class="form-control form-control-sm" 
+                   value="<?php echo FormHelpers::get_field_value($agent, 'sace_number'); ?>">
+        </div>
+        <div class="col-md-3">
+            <label for="sace_registration_date" class="form-label">SACE Registration Date</label>
+            <input type="date" id="sace_registration_date" name="sace_registration_date" class="form-control form-control-sm" 
+                   value="<?php echo FormHelpers::get_field_value($agent, 'sace_registration_date'); ?>">
+        </div>
+        
+        <div class="col-md-3">
+            <label for="sace_expiry_date" class="form-label">SACE Expiry Date</label>
+            <input type="date" id="sace_expiry_date" name="sace_expiry_date" class="form-control form-control-sm" 
+                   value="<?php echo FormHelpers::get_field_value($agent, 'sace_expiry_date'); ?>">
+        </div>
+    </div>
+
+    <div class="border-top border-opacity-25 border-3 border-discovery my-5 mx-1"></div>
+
     <!-- Address Section -->
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-3">
             <label for="google_address_search" class="form-label">Search Address</label>
             <div id="google_address_container">
                 <input type="text" id="google_address_search" class="form-control form-control-sm" 
@@ -202,7 +222,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
     </div>
     
     <div class="row mt-3">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <label for="address_line_1" class="form-label">Street Address <span class="text-danger">*</span></label>
             <input type="text" id="address_line_1" name="address_line_1" 
                    class="form-control form-control-sm <?php echo FormHelpers::get_error_class($errors, 'address_line_1'); ?>" 
@@ -211,14 +231,11 @@ use WeCoza\Agents\Helpers\FormHelpers;
             <?php FormHelpers::display_field_error($errors, 'address_line_1'); ?>
         </div>
         
-        <div class="col-md-6">
+        <div class="col-md-3">
             <label for="address_line_2" class="form-label">Unit/Complex</label>
             <input type="text" id="address_line_2" name="address_line_2" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'address_line_2'); ?>">
         </div>
-    </div>
-
-    <div class="row mt-3">
         <div class="col-md-3">
             <label for="residential_suburb" class="form-label">Suburb <span class="text-danger">*</span></label>
             <input type="text" id="residential_suburb" name="residential_suburb" 
@@ -227,6 +244,9 @@ use WeCoza\Agents\Helpers\FormHelpers;
             <div class="invalid-feedback">Please provide a suburb.</div>
             <?php FormHelpers::display_field_error($errors, 'residential_suburb'); ?>
         </div>
+    </div>
+
+    <div class="row mt-3">
         
         <div class="col-md-3">
             <label for="city_town" class="form-label">City/Town <span class="text-danger">*</span></label>
@@ -276,7 +296,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
             $field_name = "preferred_working_area_$i";
             $selected_value = isset($_POST[$field_name]) ? $_POST[$field_name] : (isset($preferred_areas[$i-1]) ? $preferred_areas[$i-1] : '');
         ?>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="<?php echo $field_name; ?>" class="form-label">
                 Preferred Working Area <?php echo $i; ?> <?php if ($i === 1) : ?><span class="text-danger">*</span><?php endif; ?>
             </label>
@@ -300,14 +320,8 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
     <div class="border-top border-opacity-25 border-3 border-discovery my-5 mx-1"></div>
 
-    <!-- SACE Registration Section -->
+    <!-- Phase Registered Section -->
     <div class="row">
-        <div class="col-md-3">
-            <label for="sace_number" class="form-label">SACE Registration Number</label>
-            <input type="text" id="sace_number" name="sace_number" class="form-control form-control-sm" 
-                   value="<?php echo FormHelpers::get_field_value($agent, 'sace_number'); ?>">
-        </div>
-        
         <div class="col-md-3">
             <label for="phase_registered" class="form-label">Phase Registered</label>
             <select id="phase_registered" name="phase_registered" class="form-select form-select-sm">
@@ -319,42 +333,20 @@ use WeCoza\Agents\Helpers\FormHelpers;
             </select>
         </div>
         
-        <div class="col-md-6">
+        <div class="col-md-3">
             <label for="subjects_registered" class="form-label">Subjects Registered <span class="text-danger">*</span></label>
             <input type="text" id="subjects_registered" name="subjects_registered" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'subjects_registered'); ?>" 
                    placeholder="e.g., Mathematics, Science, English" required>
         </div>
-    </div>
-    
-    <div class="row mt-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="highest_qualification" class="form-label">Highest Qualification <span class="text-danger">*</span></label>
             <input type="text" id="highest_qualification" name="highest_qualification" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'highest_qualification'); ?>" 
                    placeholder="e.g., Bachelor of Education" required>
         </div>
         
-        <div class="col-md-2">
-            <label for="sace_registration_date" class="form-label">SACE Registration Date</label>
-            <input type="date" id="sace_registration_date" name="sace_registration_date" class="form-control form-control-sm" 
-                   value="<?php echo FormHelpers::get_field_value($agent, 'sace_registration_date'); ?>">
-        </div>
-        
-        <div class="col-md-2">
-            <label for="sace_expiry_date" class="form-label">SACE Expiry Date</label>
-            <input type="date" id="sace_expiry_date" name="sace_expiry_date" class="form-control form-control-sm" 
-                   value="<?php echo FormHelpers::get_field_value($agent, 'sace_expiry_date'); ?>">
-        </div>
-        
-        <div class="col-md-2">
-            <label for="quantum_assessment" class="form-label">Quantum Assessment % <span class="text-danger">*</span></label>
-            <input type="number" id="quantum_assessment" name="quantum_assessment" class="form-control form-control-sm" 
-                   value="<?php echo FormHelpers::get_field_value($agent, 'quantum_assessment'); ?>" 
-                   min="0" max="100" step="1" required>
-        </div>
-        
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="agent_training_date" class="form-label">Agent Training Date <span class="text-danger">*</span></label>
             <input type="date" id="agent_training_date" name="agent_training_date" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'agent_training_date'); ?>" required>
@@ -365,6 +357,13 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
     <!-- Quantum Tests Section -->
     <div class="row">
+
+        <div class="col-md-2">
+            <label for="quantum_assessment" class="form-label">Quantum Assessment % <span class="text-danger">*</span></label>
+            <input type="number" id="quantum_assessment" name="quantum_assessment" class="form-control form-control-sm" 
+                   value="<?php echo FormHelpers::get_field_value($agent, 'quantum_assessment'); ?>" 
+                   min="0" max="100" step="1" required>
+        </div>
         <div class="col-md-2">
             <label for="quantum_maths_score" class="form-label">Quantum Maths Score % <span class="text-danger">*</span></label>
             <input type="number" id="quantum_maths_score" name="quantum_maths_score" class="form-control form-control-sm" 
@@ -384,15 +383,6 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
     <!-- Criminal Record Check Section -->
     <div class="row">
-        <div class="col-md-6">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="criminal_record_checked" name="criminal_record_checked" value="1" 
-                       <?php checked(FormHelpers::get_field_value($agent, 'criminal_record_checked'), '1'); ?>>
-                <label class="form-check-label" for="criminal_record_checked">
-                    Criminal Record Check Completed
-                </label>
-            </div>
-        </div>
         
         <div class="col-md-3">
             <label for="criminal_record_date" class="form-label">Criminal Record Check Date</label>
@@ -414,15 +404,6 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
     <!-- Agreement Section -->
     <div class="row">
-        <div class="col-md-4">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="signed_agreement" name="signed_agreement" value="1" 
-                       <?php checked(FormHelpers::get_field_value($agent, 'signed_agreement'), '1'); ?> required>
-                <label class="form-check-label" for="signed_agreement">
-                    Agent Agreement Signed
-                 <span class="text-danger">*</span></label>
-            </div>
-        </div>
         
         <div class="col-md-4">
             <label for="signed_agreement_date" class="form-label">Agreement Signed Date <span class="text-danger">*</span></label>
@@ -445,7 +426,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
     <!-- Banking Details Section -->
     <h5 class="mb-3">Banking Details</h5>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="bank_name" class="form-label">Bank Name <span class="text-danger">*</span></label>
             <input type="text" id="bank_name" name="bank_name" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'bank_name'); ?>" required>
@@ -463,15 +444,12 @@ use WeCoza\Agents\Helpers\FormHelpers;
                    value="<?php echo FormHelpers::get_field_value($agent, 'account_number'); ?>" required>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="branch_code" class="form-label">Branch Code <span class="text-danger">*</span></label>
             <input type="text" id="branch_code" name="branch_code" class="form-control form-control-sm" 
                    value="<?php echo FormHelpers::get_field_value($agent, 'branch_code'); ?>" required>
         </div>
-    </div>
-    
-    <div class="row mt-3">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="account_type" class="form-label">Account Type <span class="text-danger">*</span></label>
             <select id="account_type" name="account_type" class="form-select form-select-sm" required>
                 <option value="">Select</option>

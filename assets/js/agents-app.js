@@ -187,31 +187,4 @@ jQuery(document).ready(function($) {
 
 
 
-            function toggleSignedAgreementFields() {
-                if ($('#signed_agreement').is(':checked')) {
-                    // Show the fields by removing the 'd-none' class from their parent containers
-                    $('#signed_agreement_date').closest('.col-md-3').removeClass('d-none');
-                    $('#signed_agreement_file').closest('.col-md-3').removeClass('d-none');
-                    // Optionally, you can set these fields as required:
-                    $('#signed_agreement_date').prop('required', true);
-                    $('#signed_agreement_file').prop('required', true);
-                } else {
-                    // Clear any entered values:
-                    $('#signed_agreement_date').val('');
-                    $('#signed_agreement_file').val('');
-                    // Hide the fields by adding the 'd-none' class back to their parent containers
-                    $('#signed_agreement_date').closest('.col-md-3').addClass('d-none');
-                    $('#signed_agreement_file').closest('.col-md-3').addClass('d-none');
-                    // Optionally, remove the required property:
-                    $('#signed_agreement_date').prop('required', false);
-                    $('#signed_agreement_file').prop('required', false);
-                }
-            }
-
-            // Run the function when the checkbox state changes
-            $('#signed_agreement').on('change', toggleSignedAgreementFields);
-
-            // Optionally, initialize on page load (in case the checkbox is pre-checked)
-            toggleSignedAgreementFields();
-
 }) // jQuery(document).ready(function($) {

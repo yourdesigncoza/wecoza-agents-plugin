@@ -128,8 +128,6 @@ class FormValidator {
                     'highest_qualification' => __('Highest qualification', 'wecoza-agents-plugin'),
                     'quantum_maths_passed' => __('Quantum mathematics test', 'wecoza-agents-plugin'),
                     'quantum_science_passed' => __('Quantum science test', 'wecoza-agents-plugin'),
-                    'criminal_record_checked' => __('Criminal record check', 'wecoza-agents-plugin'),
-                    'signed_agreement' => __('Agent agreement', 'wecoza-agents-plugin'),
                 ));
                 break;
                 
@@ -321,14 +319,6 @@ class FormValidator {
             }
         }
         
-        // Validate date relationships
-        if (!empty($this->data['signed_agreement']) && empty($this->data['signed_agreement_date'])) {
-            $this->errors['signed_agreement_date'] = __('Agreement date is required when agreement is signed.', 'wecoza-agents-plugin');
-        }
-        
-        if (!empty($this->data['criminal_record_checked']) && empty($this->data['criminal_record_date'])) {
-            $this->errors['criminal_record_date'] = __('Criminal record check date is required.', 'wecoza-agents-plugin');
-        }
     }
 
     /**

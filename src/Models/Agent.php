@@ -110,12 +110,10 @@ class Agent {
         'quantum_assessment' => '',  // Fixed typo from quantum_assesment
         
         // Criminal Record (matches database)
-        'criminal_record_checked' => false,  // New column added
         'criminal_record_date' => '',  // New column added
         'criminal_record_file' => '',  // New column added
         
         // Agreement (matches database)
-        'signed_agreement' => false,
         'signed_agreement_date' => '',
         'signed_agreement_file' => '',  // Database column name
         
@@ -325,8 +323,6 @@ class Agent {
         
         // Convert boolean fields
         $boolean_fields = array(
-            'criminal_record_checked',
-            'signed_agreement'
         );
         
         foreach ($boolean_fields as $field) {
@@ -738,25 +734,7 @@ class Agent {
         return $this->get('quantum_maths_score') > 0 || $this->get('quantum_science_score') > 0;
     }
 
-    /**
-     * Check if agent has signed agreement
-     *
-     * @since 1.0.0
-     * @return bool Whether agreement is signed
-     */
-    public function has_signed_agreement() {
-        return (bool) $this->get('signed_agreement');
-    }
 
-    /**
-     * Check if criminal record is checked
-     *
-     * @since 1.0.0
-     * @return bool Whether criminal record is checked
-     */
-    public function has_criminal_record_check() {
-        return (bool) $this->get('criminal_record_checked');
-    }
 
     /**
      * Get status label

@@ -233,7 +233,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE123456',
                 'quantum_maths_score' => 85,
                 'quantum_science_score' => 92,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 2,
@@ -249,7 +248,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE789012',
                 'quantum_maths_score' => 0,
                 'quantum_science_score' => 78,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 3,
@@ -265,7 +263,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => '',
                 'quantum_maths_score' => 88,
                 'quantum_science_score' => 0,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 4,
@@ -281,7 +278,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE345678',
                 'quantum_maths_score' => 85,
                 'quantum_science_score' => 92,
-                'signed_agreement' => false,
             ),
             array(
                 'id' => 5,
@@ -297,7 +293,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE567890',
                 'quantum_maths_score' => 0,
                 'quantum_science_score' => 0,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 6,
@@ -313,7 +308,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE678901',
                 'quantum_maths_score' => 0,
                 'quantum_science_score' => 78,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 7,
@@ -329,7 +323,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => '',
                 'quantum_maths_score' => 88,
                 'quantum_science_score' => 0,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 8,
@@ -345,7 +338,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE890123',
                 'quantum_maths_score' => 85,
                 'quantum_science_score' => 92,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 9,
@@ -361,7 +353,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE901234',
                 'quantum_maths_score' => 0,
                 'quantum_science_score' => 0,
-                'signed_agreement' => true,
             ),
             array(
                 'id' => 10,
@@ -377,7 +368,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'sace_number' => 'SACE012345',
                 'quantum_maths_score' => 88,
                 'quantum_science_score' => 0,
-                'signed_agreement' => true,
             ),
         );
     }
@@ -549,9 +539,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
             return (isset($agent['quantum_maths_score']) && $agent['quantum_maths_score'] > 0) ||
                    (isset($agent['quantum_science_score']) && $agent['quantum_science_score'] > 0);
         }));
-        $agreement_signed = count(array_filter($all_agents, function($agent) {
-            return isset($agent['signed_agreement']) && $agent['signed_agreement'];
-        }));
         
         // Return statistics with demo badges
         return array(
@@ -578,12 +565,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 'count' => $quantum_qualified,
                 'badge' => '+1',
                 'badge_type' => 'warning'
-            ),
-            'agreement_signed' => array(
-                'label' => __('Agreement Signed', 'wecoza-agents-plugin'),
-                'count' => $agreement_signed,
-                'badge' => '+4',
-                'badge_type' => 'success'
             )
         );
     }

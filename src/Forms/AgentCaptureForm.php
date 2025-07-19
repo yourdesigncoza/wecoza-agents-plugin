@@ -187,8 +187,6 @@ class AgentCaptureForm {
         
         // Handle checkboxes
         $checkbox_fields = array(
-            'criminal_record_checked',
-            'signed_agreement'
         );
         
         foreach ($checkbox_fields as $field) {
