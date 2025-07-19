@@ -228,30 +228,30 @@
     /**
      * Initialize pagination functionality
      */
-    function agents_init_pagination() {
-        // Check if pagination container already exists
-        if ($('#agents-pagination').length > 0) {
-            $paginationContainer = $('#agents-pagination');
-            return;
-        }
+    // function agents_init_pagination() {
+    //     // Check if pagination container already exists
+    //     if ($('#agents-pagination').length > 0) {
+    //         $paginationContainer = $('#agents-pagination');
+    //         return;
+    //     }
 
-        // Create pagination container
-        $paginationContainer = $('<div>', {
-            id: 'agents-pagination',
-            class: 'd-flex justify-content-between mt-3'
-        });
+    //     // Create pagination container
+    //     $paginationContainer = $('<div>', {
+    //         id: 'agents-pagination',
+    //         class: 'd-flex justify-content-between mt-3'
+    //     });
 
-        // Insert pagination after the table container
-        $table.closest('.fixed-table-body').after($paginationContainer);
+    //     // Insert pagination after the table container
+    //     $table.closest('.fixed-table-body').after($paginationContainer);
 
-        // Initialize filtered rows with all rows
-        filteredRows = $tableRows.toArray().map(row => $(row));
-        totalRows = filteredRows.length;
-        visibleRows = totalRows;
+    //     // Initialize filtered rows with all rows
+    //     filteredRows = $tableRows.toArray().map(row => $(row));
+    //     totalRows = filteredRows.length;
+    //     visibleRows = totalRows;
 
-        // Calculate initial pagination
-        agents_calculate_pagination_info();
-    }
+    //     // Calculate initial pagination
+    //     agents_calculate_pagination_info();
+    // }
 
     /**
      * Calculate pagination information
@@ -306,15 +306,15 @@
         let paginationHTML = '';
 
         // Info display (left side)
-        if (totalItems > 0) {
-            paginationHTML += `<span class="d-none d-sm-inline-block" data-list-info="data-list-info">
-                ${startItem} to ${endItem} <span class="text-body-tertiary"> Items of </span>${totalItems}
-            </span>`;
-        } else {
-            paginationHTML += `<span class="d-none d-sm-inline-block" data-list-info="data-list-info">
-                0 <span class="text-body-tertiary"> Items of </span>0
-            </span>`;
-        }
+        // if (totalItems > 0) {
+        //     paginationHTML += `<span class="d-none d-sm-inline-block" data-list-info="data-list-info">
+        //         ${startItem} to ${endItem} <span class="text-body-tertiary"> Items of </span>${totalItems}
+        //     </span>`;
+        // } else {
+        //     paginationHTML += `<span class="d-none d-sm-inline-block" data-list-info="data-list-info">
+        //         0 <span class="text-body-tertiary"> Items of </span>0
+        //     </span>`;
+        // }
 
         // Navigation controls (right side) - Bootstrap pagination
         paginationHTML += '<nav aria-label="Agents pagination">';

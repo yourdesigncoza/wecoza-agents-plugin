@@ -10,6 +10,9 @@
 
 namespace WeCoza\Agents\Shortcodes;
 
+use WeCoza\Agents\Database\AgentQueries;
+use Exception;
+
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
@@ -58,6 +61,13 @@ class DisplayAgentShortcode extends AbstractShortcode {
     private $sort_order = 'ASC';
 
     /**
+     * Agent queries instance
+     *
+     * @var AgentQueries
+     */
+    protected $agent_queries;
+
+    /**
      * Initialize shortcode
      *
      * @since 1.0.0
@@ -72,6 +82,9 @@ class DisplayAgentShortcode extends AbstractShortcode {
             'show_actions' => true,
             'columns' => '', // Comma-separated list of columns to show
         );
+        
+        // Initialize agent queries
+        $this->agent_queries = new AgentQueries();
     }
 
     /**
@@ -175,22 +188,32 @@ class DisplayAgentShortcode extends AbstractShortcode {
      * @return array Agents array
      */
     private function get_agents() {
-        // For now, return hardcoded data matching the original shortcode
-        // In production, this would query the database
-        $all_agents = $this->get_hardcoded_agents();
-        
-        // Apply search filter
-        if (!empty($this->search_query)) {
-            $all_agents = array_filter($all_agents, array($this, 'filter_by_search'));
-            $all_agents = array_values($all_agents); // Re-index array
+        try {
+            // Build query arguments
+            $args = array(
+                'status' => 'all', // Get all agents regardless of status
+                'orderby' => $this->map_sort_column($this->sort_column),
+                'order' => $this->sort_order,
+                'limit' => $this->per_page,
+                'offset' => ($this->current_page - 1) * $this->per_page,
+                'search' => $this->search_query,
+            );
+            
+            // Get agents from database
+            $agents = $this->agent_queries->get_agents($args);
+            
+            // Map fields for frontend
+            $mapped_agents = array();
+            foreach ($agents as $agent) {
+                $mapped_agents[] = $this->map_agent_fields($agent);
+            }
+            
+            return $mapped_agents;
+            
+        } catch (Exception $e) {
+            error_log('WeCoza Agents: Error fetching agents - ' . $e->getMessage());
+            return array();
         }
-        
-        // Apply sorting
-        usort($all_agents, array($this, 'sort_agents'));
-        
-        // Apply pagination
-        $offset = ($this->current_page - 1) * $this->per_page;
-        return array_slice($all_agents, $offset, $this->per_page);
     }
 
     /**
@@ -200,218 +223,23 @@ class DisplayAgentShortcode extends AbstractShortcode {
      * @return int Total agents
      */
     private function get_total_agents() {
-        // For now, return hardcoded count
-        $all_agents = $this->get_hardcoded_agents();
-        
-        // Apply search filter for accurate count
-        if (!empty($this->search_query)) {
-            $all_agents = array_filter($all_agents, array($this, 'filter_by_search'));
+        try {
+            // Build query arguments without pagination for count
+            $args = array(
+                'status' => 'all',
+                'search' => $this->search_query,
+                'limit' => 0, // No limit to get total count
+            );
+            
+            // Get all agents matching the criteria
+            $agents = $this->agent_queries->get_agents($args);
+            
+            return count($agents);
+            
+        } catch (Exception $e) {
+            error_log('WeCoza Agents: Error counting agents - ' . $e->getMessage());
+            return 0;
         }
-        
-        return count($all_agents);
-    }
-
-    /**
-     * Get hardcoded agents data
-     *
-     * @since 1.0.0
-     * @return array Agents data
-     */
-    private function get_hardcoded_agents() {
-        return array(
-            array(
-                'id' => 1,
-                'first_name' => 'Peter',
-                'initials' => 'P.',
-                'last_name' => 'Wessels',
-                'gender' => 'Male',
-                'race' => 'White',
-                'phone' => '0123456789',
-                'email' => 'peter.w@example.com',
-                'city' => 'Cape Town',
-                'status' => 'active',
-                'sace_number' => 'SACE123456',
-                'quantum_maths_score' => 85,
-                'quantum_science_score' => 92,
-            ),
-            array(
-                'id' => 2,
-                'first_name' => 'Sarah',
-                'initials' => 'S.',
-                'last_name' => 'Johnson',
-                'gender' => 'Female',
-                'race' => 'African',
-                'phone' => '0987654321',
-                'email' => 'sarah.j@example.com',
-                'city' => 'Johannesburg',
-                'status' => 'active',
-                'sace_number' => 'SACE789012',
-                'quantum_maths_score' => 0,
-                'quantum_science_score' => 78,
-            ),
-            array(
-                'id' => 3,
-                'first_name' => 'David',
-                'initials' => 'D.',
-                'last_name' => 'Smith',
-                'gender' => 'Male',
-                'race' => 'Coloured',
-                'phone' => '0212223344',
-                'email' => 'david.s@example.com',
-                'city' => 'Durban',
-                'status' => 'active',
-                'sace_number' => '',
-                'quantum_maths_score' => 88,
-                'quantum_science_score' => 0,
-            ),
-            array(
-                'id' => 4,
-                'first_name' => 'Maria',
-                'initials' => 'M.',
-                'last_name' => 'Garcia',
-                'gender' => 'Female',
-                'race' => 'Indian',
-                'phone' => '0334455667',
-                'email' => 'maria.g@example.com',
-                'city' => 'Pretoria',
-                'status' => 'active',
-                'sace_number' => 'SACE345678',
-                'quantum_maths_score' => 85,
-                'quantum_science_score' => 92,
-            ),
-            array(
-                'id' => 5,
-                'first_name' => 'John',
-                'initials' => 'J.',
-                'last_name' => 'Doe',
-                'gender' => 'Male',
-                'race' => 'White',
-                'phone' => '0112233445',
-                'email' => 'john.d@example.com',
-                'city' => 'Bloemfontein',
-                'status' => 'inactive',
-                'sace_number' => 'SACE567890',
-                'quantum_maths_score' => 0,
-                'quantum_science_score' => 0,
-            ),
-            array(
-                'id' => 6,
-                'first_name' => 'Emily',
-                'initials' => 'E.',
-                'last_name' => 'Davis',
-                'gender' => 'Female',
-                'race' => 'African',
-                'phone' => '0445566778',
-                'email' => 'emily.d@example.com',
-                'city' => 'Port Elizabeth',
-                'status' => 'active',
-                'sace_number' => 'SACE678901',
-                'quantum_maths_score' => 0,
-                'quantum_science_score' => 78,
-            ),
-            array(
-                'id' => 7,
-                'first_name' => 'Michael',
-                'initials' => 'M.',
-                'last_name' => 'Brown',
-                'gender' => 'Male',
-                'race' => 'Coloured',
-                'phone' => '0556677889',
-                'email' => 'michael.b@example.com',
-                'city' => 'East London',
-                'status' => 'active',
-                'sace_number' => '',
-                'quantum_maths_score' => 88,
-                'quantum_science_score' => 0,
-            ),
-            array(
-                'id' => 8,
-                'first_name' => 'Linda',
-                'initials' => 'L.',
-                'last_name' => 'Taylor',
-                'gender' => 'Female',
-                'race' => 'Indian',
-                'phone' => '0667788990',
-                'email' => 'linda.t@example.com',
-                'city' => 'Kimberley',
-                'status' => 'active',
-                'sace_number' => 'SACE890123',
-                'quantum_maths_score' => 85,
-                'quantum_science_score' => 92,
-            ),
-            array(
-                'id' => 9,
-                'first_name' => 'Robert',
-                'initials' => 'R.',
-                'last_name' => 'Wilson',
-                'gender' => 'Male',
-                'race' => 'White',
-                'phone' => '0778899001',
-                'email' => 'robert.w@example.com',
-                'city' => 'Polokwane',
-                'status' => 'active',
-                'sace_number' => 'SACE901234',
-                'quantum_maths_score' => 0,
-                'quantum_science_score' => 0,
-            ),
-            array(
-                'id' => 10,
-                'first_name' => 'Jessica',
-                'initials' => 'J.',
-                'last_name' => 'Lee',
-                'gender' => 'Female',
-                'race' => 'African',
-                'phone' => '0889900112',
-                'email' => 'jessica.l@example.com',
-                'city' => 'Nelspruit',
-                'status' => 'active',
-                'sace_number' => 'SACE012345',
-                'quantum_maths_score' => 88,
-                'quantum_science_score' => 0,
-            ),
-        );
-    }
-
-    /**
-     * Filter agents by search query
-     *
-     * @since 1.0.0
-     * @param array $agent Agent data
-     * @return bool Whether agent matches search
-     */
-    private function filter_by_search($agent) {
-        $search = strtolower($this->search_query);
-        $searchable_fields = array('first_name', 'last_name', 'email', 'phone', 'city');
-        
-        foreach ($searchable_fields as $field) {
-            if (isset($agent[$field]) && stripos($agent[$field], $search) !== false) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-
-    /**
-     * Sort agents
-     *
-     * @since 1.0.0
-     * @param array $a First agent
-     * @param array $b Second agent
-     * @return int Sort result
-     */
-    private function sort_agents($a, $b) {
-        $column = $this->sort_column;
-        
-        // Handle missing values
-        $val_a = isset($a[$column]) ? $a[$column] : '';
-        $val_b = isset($b[$column]) ? $b[$column] : '';
-        
-        // Compare values
-        $result = strcasecmp($val_a, $val_b);
-        
-        // Apply sort order
-        return ($this->sort_order === 'DESC') ? -$result : $result;
     }
 
     /**
@@ -519,53 +347,135 @@ class DisplayAgentShortcode extends AbstractShortcode {
     }
 
     /**
+     * Map database agent fields to frontend expected fields
+     *
+     * @since 1.0.0
+     * @param array $agent Agent data from database
+     * @return array Mapped agent data
+     */
+    private function map_agent_fields($agent) {
+        return array(
+            'id' => $agent['agent_id'],
+            'first_name' => $agent['first_name'],
+            'initials' => $agent['initials'],
+            'last_name' => $agent['surname'],
+            'gender' => $agent['gender'],
+            'race' => $agent['race'],
+            'phone' => $agent['tel_number'],
+            'email' => $agent['email_address'],
+            'city' => $agent['city'],
+            'status' => $agent['status'],
+            'sace_number' => $agent['sace_number'],
+            'quantum_maths_score' => intval($agent['quantum_maths_score']),
+            'quantum_science_score' => intval($agent['quantum_science_score']),
+        );
+    }
+
+    /**
+     * Map frontend column names to database column names
+     *
+     * @since 1.0.0
+     * @param string $column Frontend column name
+     * @return string Database column name
+     */
+    private function map_sort_column($column) {
+        $map = array(
+            'last_name' => 'surname',
+            'phone' => 'tel_number',
+            'email' => 'email_address',
+        );
+        
+        return isset($map[$column]) ? $map[$column] : $column;
+    }
+
+    /**
      * Get agent statistics for display
      *
      * @since 1.0.0
      * @return array Agent statistics with counts and badges
      */
     private function get_agent_statistics() {
-        $all_agents = $this->get_hardcoded_agents();
-        
-        // Calculate statistics
-        $total_agents = count($all_agents);
-        $active_agents = count(array_filter($all_agents, function($agent) {
-            return isset($agent['status']) && $agent['status'] === 'active';
-        }));
-        $sace_registered = count(array_filter($all_agents, function($agent) {
-            return !empty($agent['sace_number']);
-        }));
-        $quantum_qualified = count(array_filter($all_agents, function($agent) {
-            return (isset($agent['quantum_maths_score']) && $agent['quantum_maths_score'] > 0) ||
-                   (isset($agent['quantum_science_score']) && $agent['quantum_science_score'] > 0);
-        }));
-        
-        // Return statistics with demo badges
-        return array(
-            'total_agents' => array(
-                'label' => __('Total Agents', 'wecoza-agents-plugin'),
-                'count' => $total_agents,
-                'badge' => '+3',
-                'badge_type' => 'success'
-            ),
-            'active_agents' => array(
-                'label' => __('Active Agents', 'wecoza-agents-plugin'),
-                'count' => $active_agents,
-                'badge' => null,
-                'badge_type' => null
-            ),
-            'sace_registered' => array(
-                'label' => __('SACE Registered', 'wecoza-agents-plugin'),
-                'count' => $sace_registered,
-                'badge' => '+2',
-                'badge_type' => 'success'
-            ),
-            'quantum_qualified' => array(
-                'label' => __('Quantum Qualified', 'wecoza-agents-plugin'),
-                'count' => $quantum_qualified,
-                'badge' => '+1',
-                'badge_type' => 'warning'
-            )
-        );
+        try {
+            $db = \WeCoza\Agents\Database\DatabaseService::getInstance();
+            
+            // Get total agents count
+            $total_sql = "SELECT COUNT(*) as count FROM agents WHERE status != 'deleted'";
+            $total_result = $db->query($total_sql);
+            $total_agents = $total_result ? $total_result->fetch()['count'] : 0;
+            
+            // Get active agents count
+            $active_sql = "SELECT COUNT(*) as count FROM agents WHERE status = 'active'";
+            $active_result = $db->query($active_sql);
+            $active_agents = $active_result ? $active_result->fetch()['count'] : 0;
+            
+            // Get SACE registered count
+            $sace_sql = "SELECT COUNT(*) as count FROM agents WHERE sace_number IS NOT NULL AND sace_number != '' AND status != 'deleted'";
+            $sace_result = $db->query($sace_sql);
+            $sace_registered = $sace_result ? $sace_result->fetch()['count'] : 0;
+            
+            // Get quantum qualified count
+            $quantum_sql = "SELECT COUNT(*) as count FROM agents WHERE (quantum_maths_score > 0 OR quantum_science_score > 0) AND status != 'deleted'";
+            $quantum_result = $db->query($quantum_sql);
+            $quantum_qualified = $quantum_result ? $quantum_result->fetch()['count'] : 0;
+            
+            // Return statistics without demo badges
+            return array(
+                'total_agents' => array(
+                    'label' => __('Total Agents', 'wecoza-agents-plugin'),
+                    'count' => $total_agents,
+                    'badge' => null,
+                    'badge_type' => null
+                ),
+                'active_agents' => array(
+                    'label' => __('Active Agents', 'wecoza-agents-plugin'),
+                    'count' => $active_agents,
+                    'badge' => null,
+                    'badge_type' => null
+                ),
+                'sace_registered' => array(
+                    'label' => __('SACE Registered', 'wecoza-agents-plugin'),
+                    'count' => $sace_registered,
+                    'badge' => null,
+                    'badge_type' => null
+                ),
+                'quantum_qualified' => array(
+                    'label' => __('Quantum Qualified', 'wecoza-agents-plugin'),
+                    'count' => $quantum_qualified,
+                    'badge' => null,
+                    'badge_type' => null
+                )
+            );
+            
+        } catch (Exception $e) {
+            error_log('WeCoza Agents: Error fetching statistics - ' . $e->getMessage());
+            
+            // Return zeros on error
+            return array(
+                'total_agents' => array(
+                    'label' => __('Total Agents', 'wecoza-agents-plugin'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ),
+                'active_agents' => array(
+                    'label' => __('Active Agents', 'wecoza-agents-plugin'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ),
+                'sace_registered' => array(
+                    'label' => __('SACE Registered', 'wecoza-agents-plugin'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                ),
+                'quantum_qualified' => array(
+                    'label' => __('Quantum Qualified', 'wecoza-agents-plugin'),
+                    'count' => 0,
+                    'badge' => null,
+                    'badge_type' => null
+                )
+            );
+        }
     }
 }

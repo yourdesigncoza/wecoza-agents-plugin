@@ -20,9 +20,9 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-
+$rand = rand(10,100);
 // Define plugin constants
-define('WECOZA_AGENTS_VERSION', '1.0.0');
+define('WECOZA_AGENTS_VERSION', $rand);
 define('WECOZA_AGENTS_PLUGIN_FILE', __FILE__);
 define('WECOZA_AGENTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WECOZA_AGENTS_PLUGIN_URL', plugin_dir_url(__FILE__));
