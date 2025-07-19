@@ -198,7 +198,7 @@
                         <tbody>
                            <?php if (!empty($agents)) : ?>
                            <?php foreach ($agents as $index => $agent) : ?>
-                           <tr data-index="<?php echo $index; ?>" data-agent-id="<?php echo esc_attr($agent['agent_id']); ?>">
+                           <tr data-index="<?php echo $index; ?>" data-agent-id="<?php echo esc_attr($agent['id']); ?>">
                               <?php foreach ($columns as $col_key => $col_label) : ?>
                               <td class="text-body ps-1">
                                  <?php 
@@ -216,10 +216,10 @@
                               <?php if ($atts['show_actions']) : ?>
                               <td class="text-center">
                                  <div class="dropdown">
-                                    <button class="btn btn-link text-body btn-sm dropdown-toggle" style="text-decoration: none;" type="button" id="dropdownMenuButton<?php echo esc_attr($agent['agent_id']); ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-link text-body btn-sm dropdown-toggle" style="text-decoration: none;" type="button" id="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>" data-bs-toggle="dropdown" aria-expanded="false">
                                        <i class="bi bi-three-dots"></i>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo esc_attr($agent['agent_id']); ?>">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>">
                                        <li>
                                           <?php 
                                           // Sub-task 3.4: Locate View Details button
@@ -228,14 +228,14 @@
                                           // Sub-task 3.7: Update to use get_view_url() method
                                           ?>
                                           <a class="dropdown-item view-agent-details" 
-                                             href="<?php echo esc_url($this->get_view_url($agent['agent_id'])); ?>">
+                                             href="<?php echo esc_url($this->get_view_url($agent['id'])); ?>">
                                              <?php esc_html_e('View Details', 'wecoza-agents-plugin'); ?>
                                              <i class="bi bi-eye ms-2"></i>
                                           </a>
                                        </li>
                                        <?php if ($can_manage) : ?>
                                        <li>
-                                          <a class="dropdown-item" href="<?php echo esc_url($this->get_edit_url($agent['agent_id'])); ?>">
+                                          <a class="dropdown-item" href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>">
                                              <?php esc_html_e('Edit Agent', 'wecoza-agents-plugin'); ?>
                                              <i class="bi bi-pencil ms-2"></i>
                                           </a>
@@ -243,7 +243,7 @@
                                        <li><hr class="dropdown-divider"></li>
                                        <li>
                                           <button class="dropdown-item text-danger delete-agent-btn" 
-                                             data-id="<?php echo esc_attr($agent['agent_id']); ?>">
+                                             data-id="<?php echo esc_attr($agent['id']); ?>">
                                              <?php esc_html_e('Delete Agent', 'wecoza-agents-plugin'); ?>
                                              <i class="bi bi-trash ms-2"></i>
                                           </button>
