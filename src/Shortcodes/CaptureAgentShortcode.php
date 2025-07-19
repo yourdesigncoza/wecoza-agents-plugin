@@ -241,10 +241,10 @@ class CaptureAgentShortcode extends AbstractShortcode {
             'province' => sanitize_text_field($this->get_request_param('province_region', '', 'POST')),
             'residential_postal_code' => preg_replace('/[^0-9]/', '', $this->get_request_param('postal_code', '', 'POST')),  // DB field name - numbers only
             
-            // Working Areas - Using DB field names
-            'preferred_working_area_1' => sanitize_text_field($this->get_request_param('preferred_working_area_1', '', 'POST')),
-            'preferred_working_area_2' => sanitize_text_field($this->get_request_param('preferred_working_area_2', '', 'POST')),
-            'preferred_working_area_3' => sanitize_text_field($this->get_request_param('preferred_working_area_3', '', 'POST')),
+            // Working Areas - Using DB field names (pass as-is for AgentQueries to handle NULL conversion)
+            'preferred_working_area_1' => $this->get_request_param('preferred_working_area_1', '', 'POST'),
+            'preferred_working_area_2' => $this->get_request_param('preferred_working_area_2', '', 'POST'),
+            'preferred_working_area_3' => $this->get_request_param('preferred_working_area_3', '', 'POST'),
             
             // SACE Registration
             'sace_number' => sanitize_text_field($this->get_request_param('sace_number', '', 'POST')),

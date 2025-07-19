@@ -633,9 +633,9 @@ class AgentQueries {
             'residential_postal_code' => 'sanitize_text_field',  // Database column name
             
             // Working Areas (database column names)
-            'preferred_working_area_1' => 'absint',
-            'preferred_working_area_2' => 'absint',
-            'preferred_working_area_3' => 'absint',
+            'preferred_working_area_1' => array($this, 'sanitize_working_area'),
+            'preferred_working_area_2' => array($this, 'sanitize_working_area'),
+            'preferred_working_area_3' => array($this, 'sanitize_working_area'),
             
             // SACE Registration (database column names)
             'sace_number' => 'sanitize_text_field',
@@ -692,6 +692,21 @@ class AgentQueries {
         }
         
         return $clean_data;
+    }
+
+    /**
+     * Sanitize working area field
+     * Returns NULL for empty values instead of 0 to avoid foreign key violations
+     *
+     * @since 1.0.0
+     * @param mixed $value The value to sanitize
+     * @return int|null Sanitized value or NULL if empty
+     */
+    private function sanitize_working_area($value) {
+        if (empty($value) || $value === '' || $value === '0') {
+            return null;
+        }
+        return absint($value);
     }
 
     /**
