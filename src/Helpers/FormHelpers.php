@@ -28,6 +28,7 @@ class FormHelpers {
         // Banking fields
         'account_number' => 'bank_account_number',
         'branch_code' => 'bank_branch_code',
+        'bank_branch_code' => 'bank_branch_code',
         
         // Contact fields
         'tel_number' => 'tel_number',
@@ -58,6 +59,36 @@ class FormHelpers {
         // Quantum score fields
         'quantum_maths_score' => 'quantum_maths_score',
         'quantum_science_score' => 'quantum_science_score',
+        
+        // Additional personal fields
+        'title' => 'title',
+        'second_name' => 'second_name',
+        'initials' => 'initials',
+        
+        // Additional address fields
+        'address_line_2' => 'address_line_2',
+        'residential_suburb' => 'residential_suburb',
+        
+        // Educational/Professional fields
+        'phase_registered' => 'phase_registered',
+        'subjects_registered' => 'subjects_registered',
+        'agent_training_date' => 'agent_training_date',
+        
+        // SACE date fields
+        'sace_registration_date' => 'sace_registration_date',
+        'sace_expiry_date' => 'sace_expiry_date',
+        
+        // Additional banking fields
+        'account_holder' => 'account_holder',
+        
+        // Compliance/Document fields
+        'criminal_record_date' => 'criminal_record_date',
+        'signed_agreement_date' => 'signed_agreement_date',
+        
+        // Working preference fields
+        'preferred_working_area_1' => 'preferred_working_area_1',
+        'preferred_working_area_2' => 'preferred_working_area_2',
+        'preferred_working_area_3' => 'preferred_working_area_3',
     ];
 
     /**

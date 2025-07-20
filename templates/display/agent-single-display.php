@@ -90,7 +90,18 @@ if (!defined('ABSPATH')) {
                             <div>
                                 <p class="fw-bold mb-1"><?php esc_html_e('Agent Name', 'wecoza-agents-plugin'); ?></p>
                                 <h5 class="fw-bolder text-nowrap">
-                                    <?php echo esc_html($agent['first_name'] . ' ' . $agent['last_name']); ?>
+                                    <?php 
+                                    $full_name = '';
+                                    if (!empty($agent['title'])) {
+                                        $full_name .= $agent['title'] . ' ';
+                                    }
+                                    $full_name .= $agent['first_name'];
+                                    if (!empty($agent['second_name'])) {
+                                        $full_name .= ' ' . $agent['second_name'];
+                                    }
+                                    $full_name .= ' ' . $agent['last_name'];
+                                    echo esc_html($full_name);
+                                    ?>
                                 </h5>
                             </div>
                         </div>
@@ -208,7 +219,10 @@ if (!defined('ABSPATH')) {
                                     </div>
                                 </td>
                                 <td class="py-2">
-                                    <p class="fw-semibold mb-0"><?php echo esc_html($agent['first_name'] . ' ' . $agent['last_name']); ?></p>
+                                    <p class="fw-semibold mb-0"><?php echo esc_html($full_name); ?></p>
+                                    <?php if (!empty($agent['initials'])) : ?>
+                                        <small class="text-muted"><?php esc_html_e('Initials:', 'wecoza-agents-plugin'); ?> <?php echo esc_html($agent['initials']); ?></small>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             
@@ -312,6 +326,12 @@ if (!defined('ABSPATH')) {
                                 <td class="py-2">
                                     <div class="fw-semibold mb-0">
                                         <?php echo esc_html($agent['street_address']); ?><br>
+                                        <?php if (!empty($agent['address_line_2'])) : ?>
+                                            <?php echo esc_html($agent['address_line_2']); ?><br>
+                                        <?php endif; ?>
+                                        <?php if (!empty($agent['residential_suburb'])) : ?>
+                                            <?php echo esc_html($agent['residential_suburb']); ?><br>
+                                        <?php endif; ?>
                                         <?php echo esc_html($agent['city'] . ', ' . $agent['province'] . ', ' . $agent['postal_code']); ?>
                                     </div>
                                 </td>
@@ -337,12 +357,74 @@ if (!defined('ABSPATH')) {
                                     <p class="fw-semibold mb-0">
                                         <?php if (!empty($agent['sace_number'])) : ?>
                                             <?php echo esc_html($agent['sace_number']); ?>
+                                            <?php 
+                                            // Check if SACE is expired
+                                            $is_expired = false;
+                                            if (!empty($agent['sace_expiry_date'])) {
+                                                $expiry_date = strtotime($agent['sace_expiry_date']);
+                                                $is_expired = $expiry_date < time();
+                                            }
+                                            ?>
+                                            <?php if ($is_expired) : ?>
+                                                <span class="badge bg-danger ms-2"><?php esc_html_e('Expired', 'wecoza-agents-plugin'); ?></span>
+                                            <?php else : ?>
+                                                <span class="badge bg-success ms-2"><?php esc_html_e('Valid', 'wecoza-agents-plugin'); ?></span>
+                                            <?php endif; ?>
                                         <?php else : ?>
                                             <span class="text-muted"><?php esc_html_e('Not registered', 'wecoza-agents-plugin'); ?></span>
                                         <?php endif; ?>
                                     </p>
                                 </td>
                             </tr>
+                            
+                            <?php if (!empty($agent['sace_number'])) : ?>
+                            <tr>
+                                <td class="py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex bg-info-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
+                                            <i class="bi bi-calendar-plus text-info" style="font-size: 12px;"></i>
+                                        </div>
+                                        <p class="fw-bold mb-0"><?php esc_html_e('SACE Registered :', 'wecoza-agents-plugin'); ?></p>
+                                    </div>
+                                </td>
+                                <td class="py-2">
+                                    <p class="fw-semibold mb-0">
+                                        <?php 
+                                        if (!empty($agent['sace_registration_date'])) {
+                                            echo esc_html(date_i18n($date_format, strtotime($agent['sace_registration_date'])));
+                                        } else {
+                                            echo '<span class="text-muted">-</span>';
+                                        }
+                                        ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex bg-warning-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
+                                            <i class="bi bi-calendar-x text-warning" style="font-size: 12px;"></i>
+                                        </div>
+                                        <p class="fw-bold mb-0"><?php esc_html_e('SACE Expires :', 'wecoza-agents-plugin'); ?></p>
+                                    </div>
+                                </td>
+                                <td class="py-2">
+                                    <p class="fw-semibold mb-0">
+                                        <?php 
+                                        if (!empty($agent['sace_expiry_date'])) {
+                                            echo esc_html(date_i18n($date_format, strtotime($agent['sace_expiry_date'])));
+                                            if ($is_expired) {
+                                                echo ' <span class="text-danger">(' . esc_html__('Expired', 'wecoza-agents-plugin') . ')</span>';
+                                            }
+                                        } else {
+                                            echo '<span class="text-muted">-</span>';
+                                        }
+                                        ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <?php endif; ?>
                             
                             <tr>
                                 <td class="py-2">
@@ -386,6 +468,59 @@ if (!defined('ABSPATH')) {
                                 </td>
                             </tr>
                             
+                            <tr>
+                                <td class="py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex bg-primary-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
+                                            <i class="bi bi-book text-primary" style="font-size: 12px;"></i>
+                                        </div>
+                                        <p class="fw-bold mb-0"><?php esc_html_e('Teaching Phase :', 'wecoza-agents-plugin'); ?></p>
+                                    </div>
+                                </td>
+                                <td class="py-2">
+                                    <p class="fw-semibold mb-0">
+                                        <?php echo !empty($agent['phase_registered']) ? esc_html($agent['phase_registered']) : '<span class="text-muted">-</span>'; ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex bg-info-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
+                                            <i class="bi bi-journal-bookmark text-info" style="font-size: 12px;"></i>
+                                        </div>
+                                        <p class="fw-bold mb-0"><?php esc_html_e('Subjects :', 'wecoza-agents-plugin'); ?></p>
+                                    </div>
+                                </td>
+                                <td class="py-2">
+                                    <p class="fw-semibold mb-0">
+                                        <?php echo !empty($agent['subjects_registered']) ? esc_html($agent['subjects_registered']) : '<span class="text-muted">-</span>'; ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex bg-success-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
+                                            <i class="bi bi-calendar-check text-success" style="font-size: 12px;"></i>
+                                        </div>
+                                        <p class="fw-bold mb-0"><?php esc_html_e('Training Date :', 'wecoza-agents-plugin'); ?></p>
+                                    </div>
+                                </td>
+                                <td class="py-2">
+                                    <p class="fw-semibold mb-0">
+                                        <?php 
+                                        if (!empty($agent['agent_training_date'])) {
+                                            echo esc_html(date_i18n($date_format, strtotime($agent['agent_training_date'])));
+                                        } else {
+                                            echo '<span class="text-muted">-</span>';
+                                        }
+                                        ?>
+                                    </p>
+                                </td>
+                            </tr>
                             
                             <tr>
                                 <td class="py-2">
@@ -400,8 +535,14 @@ if (!defined('ABSPATH')) {
                                     <div class="fw-semibold mb-0">
                                         <?php if (!empty($agent['bank_name']) && !empty($agent['account_number'])) : ?>
                                             <?php echo esc_html($agent['bank_name']); ?>
+                                            <?php if (!empty($agent['bank_branch_code'])) : ?>
+                                                <small class="text-muted">(<?php echo esc_html($agent['bank_branch_code']); ?>)</small>
+                                            <?php endif; ?>
                                             <div class="fs-9 text-muted">
                                                 <?php echo esc_html($agent['account_type'] . ' - ' . substr($agent['account_number'], -4)); ?>
+                                                <?php if (!empty($agent['account_holder'])) : ?>
+                                                    <br><?php esc_html_e('Holder:', 'wecoza-agents-plugin'); ?> <?php echo esc_html($agent['account_holder']); ?>
+                                                <?php endif; ?>
                                             </div>
                                         <?php else : ?>
                                             <span class="text-warning">
@@ -476,6 +617,129 @@ if (!defined('ABSPATH')) {
                             <?php endif; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+        
+        <?php // Working Preferences Section ?>
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+                    <?php esc_html_e('Preferred Working Areas', 'wecoza-agents-plugin'); ?>
+                </h6>
+            </div>
+            <div class="card-body">
+                <?php
+                // Get working area names
+                $has_working_areas = false;
+                $working_areas = array();
+                
+                for ($i = 1; $i <= 3; $i++) {
+                    $area_id = $agent["preferred_working_area_$i"] ?? null;
+                    if (!empty($area_id)) {
+                        $area_name = \WeCoza\Agents\Services\WorkingAreasService::get_working_area_by_id($area_id);
+                        if ($area_name) {
+                            $working_areas[] = $area_name;
+                            $has_working_areas = true;
+                        }
+                    }
+                }
+                ?>
+                
+                <?php if ($has_working_areas) : ?>
+                    <ol class="mb-0">
+                        <?php foreach ($working_areas as $index => $area) : ?>
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2"><?php echo $index + 1; ?></span>
+                                <?php echo esc_html($area); ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+                <?php else : ?>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <?php esc_html_e('No preferred working areas specified.', 'wecoza-agents-plugin'); ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+        </div>
+        
+        <?php // Documents Section ?>
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    <?php esc_html_e('Documents & Compliance', 'wecoza-agents-plugin'); ?>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Criminal Record Check -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="d-flex bg-danger-subtle rounded-circle flex-center me-3" style="width:40px; height:40px">
+                                <i class="bi bi-shield-check text-danger"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h6 class="mb-1"><?php esc_html_e('Criminal Record Check', 'wecoza-agents-plugin'); ?></h6>
+                                <?php if (!empty($agent['criminal_record_file'])) : ?>
+                                    <p class="text-success mb-1">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <?php esc_html_e('Completed', 'wecoza-agents-plugin'); ?>
+                                    </p>
+                                    <?php if (!empty($agent['criminal_record_date'])) : ?>
+                                        <p class="text-muted small mb-2">
+                                            <?php echo esc_html(date_i18n($date_format, strtotime($agent['criminal_record_date']))); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                    <a href="<?php echo esc_url(wp_upload_dir()['baseurl'] . $agent['criminal_record_file']); ?>" 
+                                       class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="bi bi-download me-1"></i>
+                                        <?php esc_html_e('Download', 'wecoza-agents-plugin'); ?>
+                                    </a>
+                                <?php else : ?>
+                                    <p class="text-warning mb-0">
+                                        <i class="bi bi-exclamation-circle me-1"></i>
+                                        <?php esc_html_e('Not submitted', 'wecoza-agents-plugin'); ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Signed Agreement -->
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="d-flex bg-success-subtle rounded-circle flex-center me-3" style="width:40px; height:40px">
+                                <i class="bi bi-file-earmark-check text-success"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h6 class="mb-1"><?php esc_html_e('Agent Agreement', 'wecoza-agents-plugin'); ?></h6>
+                                <?php if (!empty($agent['signed_agreement_file'])) : ?>
+                                    <p class="text-success mb-1">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <?php esc_html_e('Signed', 'wecoza-agents-plugin'); ?>
+                                    </p>
+                                    <?php if (!empty($agent['signed_agreement_date'])) : ?>
+                                        <p class="text-muted small mb-2">
+                                            <?php echo esc_html(date_i18n($date_format, strtotime($agent['signed_agreement_date']))); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                    <a href="<?php echo esc_url(wp_upload_dir()['baseurl'] . $agent['signed_agreement_file']); ?>" 
+                                       class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="bi bi-download me-1"></i>
+                                        <?php esc_html_e('Download', 'wecoza-agents-plugin'); ?>
+                                    </a>
+                                <?php else : ?>
+                                    <p class="text-warning mb-0">
+                                        <i class="bi bi-exclamation-circle me-1"></i>
+                                        <?php esc_html_e('Not signed', 'wecoza-agents-plugin'); ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
