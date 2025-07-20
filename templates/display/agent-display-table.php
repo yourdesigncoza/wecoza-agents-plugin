@@ -71,8 +71,12 @@
                   <div class="col-12">
                      <div class="scrollbar">
                         <div class="row g-0 flex-nowrap">
-                           <?php foreach ($statistics as $stat_key => $stat_data) : ?>
-                           <div class="col-auto <?php echo $stat_key === 'total_agents' ? 'pe-4' : 'px-4'; ?>">
+                           <?php 
+                           $stat_keys = array_keys($statistics);
+                           $last_key = end($stat_keys);
+                           foreach ($statistics as $stat_key => $stat_data) : 
+                           ?>
+                           <div class="col-auto <?php echo $stat_key === 'total_agents' ? 'border-end pe-4' : ($stat_key === $last_key ? 'ps-4' : 'px-4 border-end'); ?>">
                               <h6 class="text-body-tertiary">
                                  <?php echo esc_html($stat_data['label']); ?> : <?php echo esc_html($stat_data['count']); ?>
                                  <?php if (!empty($stat_data['badge'])) : ?>

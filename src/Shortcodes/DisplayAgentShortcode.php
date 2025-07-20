@@ -439,31 +439,32 @@ class DisplayAgentShortcode extends AbstractShortcode {
             $quantum_result = $db->query($quantum_sql);
             $quantum_qualified = $quantum_result ? $quantum_result->fetch()['count'] : 0;
             
-            // Return statistics without demo badges
+            // Return statistics with demo badges
+            // In production, these badge values would be calculated from historical data
             return array(
                 'total_agents' => array(
                     'label' => __('Total Agents', 'wecoza-agents-plugin'),
                     'count' => $total_agents,
-                    'badge' => null,
+                    'badge' => null, // No change indicator for total
                     'badge_type' => null
                 ),
                 'active_agents' => array(
                     'label' => __('Active Agents', 'wecoza-agents-plugin'),
                     'count' => $active_agents,
-                    'badge' => null,
+                    'badge' => null, // Could show changes if tracking history
                     'badge_type' => null
                 ),
                 'sace_registered' => array(
                     'label' => __('SACE Registered', 'wecoza-agents-plugin'),
                     'count' => $sace_registered,
-                    'badge' => null,
+                    'badge' => null, // Could show changes if tracking history
                     'badge_type' => null
                 ),
                 'quantum_qualified' => array(
                     'label' => __('Quantum Qualified', 'wecoza-agents-plugin'),
                     'count' => $quantum_qualified,
-                    'badge' => null,
-                    'badge_type' => null
+                    'badge' => '+1', // Demo value showing increase
+                    'badge_type' => 'success'
                 )
             );
             
@@ -591,13 +592,16 @@ class DisplayAgentShortcode extends AbstractShortcode {
     private function get_statistics_html($statistics) {
         ob_start();
         ?>
-        <div class="row g-0 flex-nowrap">
-            <?php foreach ($statistics as $stat_key => $stat_data) : ?>
-            <div class="col-auto <?php echo $stat_key === 'total_agents' ? 'pe-4' : 'px-4'; ?>">
-                <h6 class="text-body-tertiary">
-                    <?php echo esc_html($stat_data['label']); ?> : <?php echo esc_html($stat_data['count']); ?>
-                    <?php if (!empty($stat_data['badge'])) : ?>
-                    <div class="badge badge-phoenix fs-10 badge-phoenix-<?php echo esc_attr($stat_data['badge_type']); ?>">
+        <?php 
+        $stat_keys = array_keys($statistics);
+        $last_key = end($stat_keys);
+        foreach ($statistics as $stat_key => $stat_data) : 
+        ?>
+        <div class="col-auto <?php echo $stat_key === 'total_agents' ? 'border-end pe-4' : ($stat_key === $last_key ? 'ps-4' : 'px-4 border-end'); ?>">
+            <h6 class="text-body-tertiary">
+                <?php echo esc_html($stat_data['label']); ?> : <?php echo esc_html($stat_data['count']); ?>
+                <?php if (!empty($stat_data['badge'])) : ?>
+                <div class="badge badge-phoenix fs-10 badge-phoenix-<?php echo esc_attr($stat_data['badge_type']); ?>">
                         <?php echo esc_html($stat_data['badge']); ?>
                     </div>
                     <?php endif; ?>
