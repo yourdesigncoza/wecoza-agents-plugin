@@ -196,10 +196,6 @@ class DisplayAgentShortcode extends AbstractShortcode {
             'statistics' => $statistics,
         ), 'display');
         
-        // Load modal template if actions are enabled
-        if ($atts['show_actions']) {
-            $this->load_template('agent-modal.php', array(), 'display');
-        }
     }
 
     /**

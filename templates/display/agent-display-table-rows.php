@@ -61,14 +61,11 @@ if (!empty($agents)) :
         <?php if ($show_actions) : ?>
         <td class="text-center">
             <div class="btn-group btn-group-sm" role="group">
-                <button type="button" 
-                        class="btn btn-phoenix-secondary view-agent-btn" 
-                        data-agent-id="<?php echo esc_attr($agent['id']); ?>"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#agentModal"
-                        title="<?php esc_attr_e('View', 'wecoza-agents-plugin'); ?>">
+                <a href="<?php echo esc_url(add_query_arg('agent_id', $agent['id'], home_url('/app/all-classes/'))); ?>" 
+                   class="btn btn-phoenix-secondary"
+                   title="<?php esc_attr_e('View', 'wecoza-agents-plugin'); ?>">
                     <i class="bi bi-eye"></i>
-                </button>
+                </a>
                 <?php if ($can_manage) : ?>
                 <a href="<?php echo esc_url(add_query_arg('agent_id', $agent['id'], home_url('/agent-capture/'))); ?>" 
                    class="btn btn-phoenix-primary"

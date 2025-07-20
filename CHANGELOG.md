@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap 5 integration
 - Select2 multi-select for location preferences
 - Form field validation (client and server-side)
-- Modal view for agent details with tabbed interface
+- Page-based view for agent details with organized layout
 - PostgreSQL database support with MySQL fallback
 - Responsive design for mobile devices
 - File upload support for agreements and documents

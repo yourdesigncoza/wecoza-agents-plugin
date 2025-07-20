@@ -56,18 +56,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `src/Models/Agent.php` - Core agent model with Active Record pattern and validation
 - `src/Shortcodes/CaptureAgentShortcode.php` - Form handling and agent creation/editing
 - `src/Shortcodes/DisplayAgentShortcode.php` - Table display with search and filtering
-- `src/Shortcodes/SingleAgentShortcode.php` - Single agent display and modal views
+- `src/Shortcodes/SingleAgentShortcode.php` - Single agent display pages
 - `src/Helpers/FormHelpers.php` - Form field mapping and rendering utilities
 - `src/Helpers/ValidationHelper.php` - SA ID checksum and validation logic
 - `templates/forms/agent-capture-form.php` - Main form template
 - `templates/display/agent-display-table.php` - Agents table with search/filter
-- `templates/display/agent-single-display.php` - Single agent modal template
+- `templates/display/agent-single-display.php` - Single agent page template
 
 ### Agent Search and Statistics System
 - **Real-time Search**: JavaScript-based filtering across all agent fields
 - **Statistics Display**: Dynamic counters for total agents, active/inactive counts
 - **Field-specific Filtering**: Search by name, email, phone, SA ID, area preferences
-- **Modal Integration**: Click-to-view agent details without page refresh
+- **Page Navigation**: Click-to-view agent details on dedicated pages
 - **Data Attributes**: Searchable data stored in HTML data attributes for client-side filtering
 
 ### Common Development Tasks
@@ -93,7 +93,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Frontend Features
 - **Responsive Design**: Bootstrap 5 integration with Phoenix design system
 - **Interactive Elements**: jQuery-based interactions and form validation
-- **Modal Display**: Agent details in responsive modals with single agent view
+- **Page Display**: Agent details on dedicated responsive pages
 - **Search/Filter**: Real-time table filtering, search, and statistics
 - **Google Maps**: Address autocomplete integration
 - **File Uploads**: Agent agreement document handling with validation

@@ -46,7 +46,7 @@ Displays the agent registration/edit form.
 ```
 [wecoza_display_agents]
 ```
-Shows a searchable table of all agents with modal details view.
+Shows a searchable table of all agents with page-based details view.
 
 ## Database Configuration
 
