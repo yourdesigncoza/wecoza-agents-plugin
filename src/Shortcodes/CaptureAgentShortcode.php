@@ -85,7 +85,7 @@ class CaptureAgentShortcode extends AbstractShortcode {
         if ($google_maps_api_key) {
             wp_enqueue_script(
                 'google-maps-api',
-                'https://maps.googleapis.com/maps/api/js?key=' . esc_attr($google_maps_api_key) . '&libraries=places&loading=async',
+                'https://maps.googleapis.com/maps/api/js?key=' . esc_attr($google_maps_api_key) . '&libraries=places&loading=async&v=weekly',
                 array(),
                 WECOZA_AGENTS_VERSION,
                 true
@@ -96,13 +96,13 @@ class CaptureAgentShortcode extends AbstractShortcode {
         }
 
         // Enqueue agent form validation
-        // wp_enqueue_script(
-        //     'wecoza-agent-form-validation',
-        //     WECOZA_AGENTS_PLUGIN_URL . 'assets/js/agent-form-validation.js',
-        //     array('jquery', 'google-maps-api'),
-        //     WECOZA_AGENTS_VERSION,
-        //     true
-        // );
+        wp_enqueue_script(
+            'wecoza-agent-form-validation',
+            WECOZA_AGENTS_PLUGIN_URL . 'assets/js/agent-form-validation.js',
+            array('jquery', 'google-maps-api'),
+            WECOZA_AGENTS_VERSION,
+            true
+        );
     }
 
     /**

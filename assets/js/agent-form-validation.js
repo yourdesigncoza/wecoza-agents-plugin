@@ -186,14 +186,75 @@ jQuery(document).ready(function($) {
         generateInitials();
     }
     
-    // Google Places Autocomplete initialization - handled by WordPress enqueue system
+    // Initialize Google Places Autocomplete if container exists
+    if (document.getElementById('google_address_container')) {
+        // Wait for Google Maps API and places library to load
+        waitForGoogleMapsAndInitialize();
+    }
 });
+
+// Wait for Google Maps API to fully load including places library
+function waitForGoogleMapsAndInitialize() {
+    var maxAttempts = 50; // 5 seconds max wait
+    var attempts = 0;
+    
+    function checkGoogleMapsLoaded() {
+        attempts++;
+        
+        // Check if Google Maps API is loaded with places library
+        if (typeof google !== 'undefined' && 
+            google.maps && 
+            google.maps.places && 
+            google.maps.places.Autocomplete) {
+            
+            console.log('Google Maps API loaded, initializing Places...');
+            initializeGooglePlaces();
+            return;
+        }
+        
+        // Check if we've reached max attempts
+        if (attempts >= maxAttempts) {
+            console.error('Google Maps API failed to load after ' + (maxAttempts * 100) + 'ms');
+            showFallbackInput();
+            return;
+        }
+        
+        // Try again in 100ms
+        setTimeout(checkGoogleMapsLoaded, 100);
+    }
+    
+    // Start checking
+    checkGoogleMapsLoaded();
+}
 
 // Initialize Google Places Autocomplete (global function for callback)
 async function initializeGooglePlaces() {
     try {
-        // Import the places library
-        const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+        // Check if the new importLibrary method is available
+        if (google.maps.importLibrary) {
+            // Use new API method
+            const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+            initializeNewGooglePlaces(PlaceAutocompleteElement);
+        } else {
+            // Use old API method as fallback
+            initializeOldGooglePlaces();
+        }
+    } catch (error) {
+        console.error('Failed to initialize Google Places:', error);
+        
+        // Try fallback to old API
+        try {
+            initializeOldGooglePlaces();
+        } catch (fallbackError) {
+            console.error('Fallback Google Places initialization also failed:', fallbackError);
+            showFallbackInput();
+        }
+    }
+}
+
+// New Google Places API implementation
+function initializeNewGooglePlaces(PlaceAutocompleteElement) {
+    try {
         
         // Get the container element
         var container = document.getElementById('google_address_container');
@@ -296,13 +357,105 @@ async function initializeGooglePlaces() {
         });
         
     } catch (error) {
-        console.error('Failed to initialize Google Places:', error);
+        console.error('Failed to initialize new Google Places:', error);
+        showFallbackInput();
+    }
+}
+
+// Old Google Places API implementation (fallback)
+function initializeOldGooglePlaces() {
+    var input = document.getElementById('google_address_search');
+    if (!input) return;
+    
+    // Show the input for old API
+    input.style.display = 'block';
+    input.style.visibility = 'visible';
+    
+    // Create Autocomplete instance with old API
+    var autocomplete = new google.maps.places.Autocomplete(input, {
+        componentRestrictions: { country: 'za' }, // Restrict to South Africa
+        fields: ['place_id', 'geometry', 'name', 'formatted_address', 'address_components']
+    });
+    
+    // Add event listener for place selection
+    autocomplete.addListener('place_changed', function() {
+        var place = autocomplete.getPlace();
         
-        // Fallback: show the original input if the new API fails
-        var input = document.getElementById('google_address_search');
-        if (input) {
-            input.style.display = 'block';
-            input.placeholder = 'Address search unavailable';
+        if (!place.address_components) {
+            return;
         }
+        
+        // Parse address components (same logic as new API)
+        var streetNumber = '';
+        var route = '';
+        var suburb = '';
+        var city = '';
+        var province = '';
+        var postalCode = '';
+        var country = '';
+        
+        for (var i = 0; i < place.address_components.length; i++) {
+            var component = place.address_components[i];
+            var types = component.types;
+            
+            if (types.includes('street_number')) {
+                streetNumber = component.long_name;
+            } else if (types.includes('route')) {
+                route = component.long_name;
+            } else if (types.includes('sublocality_level_1') || types.includes('neighborhood')) {
+                suburb = component.long_name;
+            } else if (types.includes('locality')) {
+                city = component.long_name;
+            } else if (types.includes('administrative_area_level_1')) {
+                province = component.long_name;
+            } else if (types.includes('postal_code')) {
+                postalCode = component.short_name;
+            } else if (types.includes('country')) {
+                country = component.long_name;
+            }
+        }
+        
+        // Populate form fields
+        var streetAddress = (streetNumber + ' ' + route).trim();
+        if (streetAddress) {
+            jQuery('#street_address').val(streetAddress);
+        }
+        if (suburb) {
+            jQuery('#suburb_area').val(suburb);
+        }
+        if (city) {
+            jQuery('#city_town').val(city);
+        }
+        if (postalCode) {
+            jQuery('#postal_code').val(postalCode);
+        }
+        
+        // Map province names to form values
+        var provinceMap = {
+            'Gauteng': 'Gauteng',
+            'Western Cape': 'Western Cape',
+            'KwaZulu-Natal': 'KwaZulu-Natal',
+            'Eastern Cape': 'Eastern Cape',
+            'Free State': 'Free State',
+            'Mpumalanga': 'Mpumalanga',
+            'Limpopo': 'Limpopo',
+            'North West': 'North West',
+            'Northern Cape': 'Northern Cape'
+        };
+        
+        if (provinceMap[province]) {
+            jQuery('#province_region').val(provinceMap[province]).trigger('change');
+        }
+    });
+}
+
+// Show fallback input when both APIs fail
+function showFallbackInput() {
+    var input = document.getElementById('google_address_search');
+    if (input) {
+        input.style.display = 'block';
+        input.style.visibility = 'visible';
+        input.placeholder = 'Address search unavailable - enter manually';
+        input.disabled = true;
     }
 }
