@@ -336,6 +336,50 @@ if (!defined('ABSPATH')) {
                                     </div>
                                 </td>
                             </tr>
+                            
+                            <tr>
+                                <td class="py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex bg-primary-subtle rounded-circle flex-center me-3" style="width:24px; height:24px">
+                                            <i class="bi bi-geo-alt-fill text-primary" style="font-size: 12px;"></i>
+                                        </div>
+                                        <p class="fw-bold mb-0"><?php esc_html_e('Preferred Areas :', 'wecoza-agents-plugin'); ?></p>
+                                    </div>
+                                </td>
+                                <td class="py-2">
+                                    <?php
+                                    // Get working area names
+                                    $has_working_areas = false;
+                                    $working_areas = array();
+                                    
+                                    for ($i = 1; $i <= 3; $i++) {
+                                        $area_id = $agent["preferred_working_area_$i"] ?? null;
+                                        if (!empty($area_id)) {
+                                            $area_name = \WeCoza\Agents\Services\WorkingAreasService::get_working_area_by_id($area_id);
+                                            if ($area_name) {
+                                                $working_areas[] = $area_name;
+                                                $has_working_areas = true;
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    
+                                    <?php if ($has_working_areas) : ?>
+                                        <div class="fw-semibold mb-0">
+                                            <?php foreach ($working_areas as $index => $area) : ?>
+                                                <div class="mb-1">
+                                                    <span class="badge bg-primary me-2"><?php echo $index + 1; ?></span>
+                                                    <?php echo esc_html($area); ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else : ?>
+                                        <p class="fw-semibold mb-0 text-muted">
+                                            <?php esc_html_e('No preferred areas specified', 'wecoza-agents-plugin'); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -618,50 +662,6 @@ if (!defined('ABSPATH')) {
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-        
-        <?php // Working Preferences Section ?>
-        <div class="card mb-3">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">
-                    <i class="bi bi-geo-alt-fill me-2"></i>
-                    <?php esc_html_e('Preferred Working Areas', 'wecoza-agents-plugin'); ?>
-                </h6>
-            </div>
-            <div class="card-body">
-                <?php
-                // Get working area names
-                $has_working_areas = false;
-                $working_areas = array();
-                
-                for ($i = 1; $i <= 3; $i++) {
-                    $area_id = $agent["preferred_working_area_$i"] ?? null;
-                    if (!empty($area_id)) {
-                        $area_name = \WeCoza\Agents\Services\WorkingAreasService::get_working_area_by_id($area_id);
-                        if ($area_name) {
-                            $working_areas[] = $area_name;
-                            $has_working_areas = true;
-                        }
-                    }
-                }
-                ?>
-                
-                <?php if ($has_working_areas) : ?>
-                    <ol class="mb-0">
-                        <?php foreach ($working_areas as $index => $area) : ?>
-                            <li class="mb-2">
-                                <span class="badge bg-primary me-2"><?php echo $index + 1; ?></span>
-                                <?php echo esc_html($area); ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ol>
-                <?php else : ?>
-                    <p class="text-muted mb-0">
-                        <i class="bi bi-info-circle me-1"></i>
-                        <?php esc_html_e('No preferred working areas specified.', 'wecoza-agents-plugin'); ?>
-                    </p>
-                <?php endif; ?>
             </div>
         </div>
         
