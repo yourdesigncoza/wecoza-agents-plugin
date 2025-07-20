@@ -22,17 +22,21 @@ use WeCoza\Agents\Helpers\FormHelpers;
 
 ?>
 
+<?php if ($mode === 'edit' && !empty($agent['agent_id'])) : ?>
+    <div class="alert alert-subtle-primary mb-4">
+        <i class="fas fa-edit me-2"></i>
+        <strong><?php _e('Editing Agent:', 'wecoza-agents-plugin'); ?></strong>
+        <?php echo esc_html(FormHelpers::get_field_value($agent, 'first_name') . ' ' . FormHelpers::get_field_value($agent, 'surname')); ?>
+        (ID: <?php echo esc_html(FormHelpers::get_field_value($agent, 'agent_id')); ?>)
+    </div>
+<?php endif; ?>
+
 <form id="agents-form" class="ydcoza-compact-form needs-validation mt-6" method="POST" enctype="multipart/form-data" novalidate>
     <?php wp_nonce_field('submit_agent_form', 'wecoza_agents_form_nonce'); ?>
     
-    <!-- Agent ID (read-only if editing) -->
+    <!-- Hidden Agent ID field for editing -->
     <?php if ($mode === 'edit' && !empty($agent['agent_id'])) : ?>
-    <div class="row">
-        <div class="col-md-3">
-            <label for="agent_id" class="form-label">Agent ID</label>
-            <input type="text" id="agent_id" name="agent_id" class="form-control form-control-sm" value="<?php echo FormHelpers::get_field_value($agent, 'agent_id'); ?>" readonly>
-        </div>
-    </div>
+        <input type="hidden" name="editing_agent_id" value="<?php echo esc_attr(FormHelpers::get_field_value($agent, 'agent_id')); ?>">
     <?php endif; ?>
 
     <!-- Personal Information Section -->
@@ -299,7 +303,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
         <?php 
         for ($i = 1; $i <= 3; $i++) : 
             $field_name = "preferred_working_area_$i";
-            $selected_value = isset($_POST[$field_name]) ? $_POST[$field_name] : (isset($preferred_areas[$i-1]) ? $preferred_areas[$i-1] : '');
+            $selected_value = FormHelpers::get_field_value($agent, $field_name);
         ?>
         <div class="col-md-3">
             <label for="<?php echo $field_name; ?>" class="form-label">
@@ -400,8 +404,22 @@ use WeCoza\Agents\Helpers\FormHelpers;
             <label for="criminal_record_file" class="form-label">Upload Criminal Record</label>
             <input type="file" id="criminal_record_file" name="criminal_record_file" class="form-control form-control-sm" 
                    accept=".pdf,.doc,.docx">
-            <?php if (!empty(FormHelpers::get_field_value($agent, 'criminal_record_file'))) : ?>
-            <small class="text-muted">Current file uploaded</small>
+            <?php 
+            $criminal_file = FormHelpers::get_field_value($agent, 'criminal_record_file');
+            if (!empty($criminal_file)) : 
+            ?>
+            <div class="mt-1">
+                <a href="<?php echo esc_url(wp_upload_dir()['baseurl'] . $criminal_file); ?>" target="_blank" class="text-decoration-none">
+                    <span class="badge badge-phoenix fs-10 badge-phoenix-primary">
+                        <span class="badge-label">View Upload</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download ms-1" style="height:12.8px;width:12.8px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </span>
+                </a>
+            </div>
             <?php endif; ?>
         </div>
     </div>
@@ -418,11 +436,31 @@ use WeCoza\Agents\Helpers\FormHelpers;
         </div>
         
         <div class="col-md-4">
-            <label for="signed_agreement_file" class="form-label">Upload Signed Agreement <span class="text-danger">*</span></label>
+            <?php 
+            $agreement_file = FormHelpers::get_field_value($agent, 'signed_agreement_file');
+            $is_edit_mode_with_file = ($mode === 'edit' && !empty($agreement_file));
+            ?>
+            <label for="signed_agreement_file" class="form-label">
+                Upload Signed Agreement 
+                <?php if (!$is_edit_mode_with_file) : ?>
+                <span class="text-danger">*</span>
+                <?php endif; ?>
+            </label>
             <input type="file" id="signed_agreement_file" name="signed_agreement_file" class="form-control form-control-sm" 
-                   accept=".pdf,.doc,.docx" required>
-            <?php if (!empty(FormHelpers::get_field_value($agent, 'agreement_file_path'))) : ?>
-            <small class="text-muted">Current file uploaded</small>
+                   accept=".pdf,.doc,.docx" <?php echo $is_edit_mode_with_file ? '' : 'required'; ?>>
+            <?php if (!empty($agreement_file)) : ?>
+            <div class="mt-1">
+                <a href="<?php echo esc_url(wp_upload_dir()['baseurl'] . $agreement_file); ?>" target="_blank" class="text-decoration-none">
+                    <span class="badge badge-phoenix fs-10 badge-phoenix-primary">
+                        <span class="badge-label">View Upload</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download ms-1" style="height:12.8px;width:12.8px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </span>
+                </a>
+            </div>
             <?php endif; ?>
         </div>
     </div>

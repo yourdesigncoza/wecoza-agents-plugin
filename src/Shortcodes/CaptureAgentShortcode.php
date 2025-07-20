@@ -113,16 +113,15 @@ class CaptureAgentShortcode extends AbstractShortcode {
      * @param string $content Shortcode content
      */
     protected function render_shortcode($atts, $content) {
-        // Check for agent ID in URL
-        $agent_id = $this->get_request_param('agent_id', $atts['agent_id'], 'GET');
-        $mode = $agent_id > 0 ? 'edit' : $atts['mode'];
+        // Enhanced URL parameter detection
+        $agent_id = $this->detect_agent_id_from_url($atts);
+        $mode = $this->determine_form_mode($agent_id, $atts);
         
         // Load agent data if editing
         if ($mode === 'edit' && $agent_id > 0) {
-            $this->current_agent = $this->agent_queries->get_agent($agent_id);
+            $this->current_agent = $this->load_agent_for_editing($agent_id);
             if (!$this->current_agent) {
-                $this->add_error_message(__('Agent not found.', 'wecoza-agents-plugin'));
-                return;
+                return; // Error message already set in load_agent_for_editing
             }
         }
         
@@ -168,8 +167,8 @@ class CaptureAgentShortcode extends AbstractShortcode {
             // Handle file uploads
             $this->handle_file_uploads($agent_id);
             
-            // Success message
-            $this->add_success_message(__('Agent saved successfully.', 'wecoza-agents-plugin'));
+            // Enhanced success messaging based on mode
+            $this->add_success_message_for_mode($agent_id);
             
             // Redirect if specified
             if (!empty($atts['redirect_after_save'])) {
@@ -177,10 +176,12 @@ class CaptureAgentShortcode extends AbstractShortcode {
                 exit;
             }
             
-            // Clear form data on success
-            $this->form_data = array();
+            // Clear form data on success for add mode only
+            if (!$this->current_agent) {
+                $this->form_data = array();
+            }
         } else {
-            $this->add_error_message(__('Failed to save agent. Please try again.', 'wecoza-agents-plugin'));
+            $this->add_error_message_for_mode();
         }
     }
 
@@ -426,6 +427,11 @@ class CaptureAgentShortcode extends AbstractShortcode {
         
         // Handle signed agreement file
         if (!empty($_FILES['signed_agreement_file']['name'])) {
+            // Delete old file if replacing
+            if ($this->current_agent && !empty($this->current_agent['signed_agreement_file'])) {
+                $this->delete_old_file($this->current_agent['signed_agreement_file']);
+            }
+            
             $file_path = $this->upload_file('signed_agreement_file', $agent_id);
             if ($file_path) {
                 $uploaded_files['signed_agreement_file'] = $file_path;
@@ -438,6 +444,11 @@ class CaptureAgentShortcode extends AbstractShortcode {
         
         // Handle criminal record file
         if (!empty($_FILES['criminal_record_file']['name'])) {
+            // Delete old file if replacing
+            if ($this->current_agent && !empty($this->current_agent['criminal_record_file'])) {
+                $this->delete_old_file($this->current_agent['criminal_record_file']);
+            }
+            
             $file_path = $this->upload_file('criminal_record_file', $agent_id);
             if ($file_path) {
                 $uploaded_files['criminal_record_file'] = $file_path;
@@ -659,5 +670,229 @@ class CaptureAgentShortcode extends AbstractShortcode {
         
         // No API key found
         return false;
+    }
+
+    /**
+     * Detect agent ID from URL parameters with enhanced support
+     *
+     * @since 1.0.0
+     * @param array $atts Shortcode attributes
+     * @return int Agent ID or 0 if not found
+     */
+    private function detect_agent_id_from_url($atts) {
+        // Method 1: Check for "update" parameter with agent_id
+        // Supports URLs like: ?update&agent_id=30 or ?update=1&agent_id=30
+        $update_param = $this->get_request_param('update', '', 'GET');
+        if (!empty($update_param) || isset($_GET['update'])) {
+            $agent_id = $this->get_request_param('agent_id', 0, 'GET');
+            if ($agent_id > 0) {
+                return absint($agent_id);
+            }
+        }
+        
+        // Method 2: Direct agent_id parameter (backward compatibility)
+        // Supports URLs like: ?agent_id=30
+        $agent_id = $this->get_request_param('agent_id', $atts['agent_id'], 'GET');
+        if ($agent_id > 0) {
+            return absint($agent_id);
+        }
+        
+        // Method 3: Check shortcode attributes
+        if (!empty($atts['agent_id']) && $atts['agent_id'] > 0) {
+            return absint($atts['agent_id']);
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Determine form mode based on agent ID and attributes
+     *
+     * @since 1.0.0
+     * @param int $agent_id Agent ID
+     * @param array $atts Shortcode attributes
+     * @return string Form mode ('add' or 'edit')
+     */
+    private function determine_form_mode($agent_id, $atts) {
+        // If we have a valid agent ID, default to edit mode
+        if ($agent_id > 0) {
+            return 'edit';
+        }
+        
+        // Check if update parameter is set without valid agent_id
+        $update_param = $this->get_request_param('update', '', 'GET');
+        if (!empty($update_param) || isset($_GET['update'])) {
+            // Log warning about missing/invalid agent_id
+            error_log('[WeCoza Agents] Update mode requested but no valid agent_id provided');
+        }
+        
+        // Fall back to shortcode attribute or default
+        return !empty($atts['mode']) ? $atts['mode'] : 'add';
+    }
+
+    /**
+     * Load agent data for editing with enhanced error handling
+     *
+     * @since 1.0.0
+     * @param int $agent_id Agent ID
+     * @return array|null Agent data or null if not found
+     */
+    private function load_agent_for_editing($agent_id) {
+        // Validate agent ID
+        if (!$agent_id || $agent_id <= 0) {
+            $this->add_error_message(__('Invalid agent ID provided.', 'wecoza-agents-plugin'));
+            return null;
+        }
+        
+        // Check permissions for editing this specific agent
+        if (!$this->can_edit_agent($agent_id)) {
+            $this->add_error_message(__('You do not have permission to edit this agent.', 'wecoza-agents-plugin'));
+            return null;
+        }
+        
+        // Attempt to load agent data
+        try {
+            $agent_data = $this->agent_queries->get_agent($agent_id);
+            
+            if (!$agent_data) {
+                $this->add_error_message(
+                    sprintf(
+                        __('Agent with ID %d not found. Please check the agent ID and try again.', 'wecoza-agents-plugin'),
+                        $agent_id
+                    )
+                );
+                return null;
+            }
+            
+            // Log successful agent load for debugging
+            error_log("[WeCoza Agents] Successfully loaded agent {$agent_id} for editing");
+            
+            return $agent_data;
+            
+        } catch (Exception $e) {
+            error_log("[WeCoza Agents] Error loading agent {$agent_id}: " . $e->getMessage());
+            $this->add_error_message(__('An error occurred while loading the agent data. Please try again.', 'wecoza-agents-plugin'));
+            return null;
+        }
+    }
+
+    /**
+     * Check if current user can edit specific agent
+     *
+     * @since 1.0.0
+     * @param int $agent_id Agent ID
+     * @return bool Whether user can edit this agent
+     */
+    private function can_edit_agent($agent_id) {
+        // Basic permission check - must be able to manage agents
+        if (!$this->can_manage_agents()) {
+            return false;
+        }
+        
+        // Additional checks can be added here based on business rules
+        // For example: only allow editing agents created by current user
+        // or agents assigned to current user's region, etc.
+        
+        // For now, if user can manage agents, they can edit any agent
+        return true;
+    }
+
+    /**
+     * Add context-aware success message
+     *
+     * @since 1.0.0
+     * @param int $agent_id Agent ID
+     */
+    private function add_success_message_for_mode($agent_id) {
+        if ($this->current_agent) {
+            // Update mode
+            $agent_name = $this->get_agent_display_name($this->current_agent);
+            $this->add_success_message(
+                sprintf(
+                    __('Agent %s (ID: %d) has been updated successfully.', 'wecoza-agents-plugin'),
+                    $agent_name,
+                    $agent_id
+                )
+            );
+            error_log("[WeCoza Agents] Successfully updated agent {$agent_id}");
+        } else {
+            // Add mode
+            $this->add_success_message(
+                sprintf(
+                    __('New agent has been created successfully with ID: %d.', 'wecoza-agents-plugin'),
+                    $agent_id
+                )
+            );
+            error_log("[WeCoza Agents] Successfully created new agent {$agent_id}");
+        }
+    }
+
+    /**
+     * Add context-aware error message
+     *
+     * @since 1.0.0
+     */
+    private function add_error_message_for_mode() {
+        if ($this->current_agent) {
+            // Update mode
+            $this->add_error_message(__('Failed to update agent. Please check your input and try again.', 'wecoza-agents-plugin'));
+            error_log("[WeCoza Agents] Failed to update agent {$this->current_agent['agent_id']}");
+        } else {
+            // Add mode
+            $this->add_error_message(__('Failed to create new agent. Please check your input and try again.', 'wecoza-agents-plugin'));
+            error_log("[WeCoza Agents] Failed to create new agent");
+        }
+    }
+
+    /**
+     * Get agent display name from agent data
+     *
+     * @since 1.0.0
+     * @param array $agent Agent data
+     * @return string Display name
+     */
+    private function get_agent_display_name($agent) {
+        $name_parts = array();
+        
+        if (!empty($agent['first_name'])) {
+            $name_parts[] = $agent['first_name'];
+        }
+        
+        if (!empty($agent['surname'])) {
+            $name_parts[] = $agent['surname'];
+        }
+        
+        if (empty($name_parts)) {
+            return __('Unknown Agent', 'wecoza-agents-plugin');
+        }
+        
+        return implode(' ', $name_parts);
+    }
+
+    /**
+     * Delete old uploaded file
+     *
+     * @since 1.0.0
+     * @param string $file_path Relative file path from uploads directory
+     */
+    private function delete_old_file($file_path) {
+        if (empty($file_path)) {
+            return;
+        }
+        
+        // Get the full file path
+        $upload_dir = wp_upload_dir();
+        $full_path = $upload_dir['basedir'] . $file_path;
+        
+        // Check if file exists and delete it
+        if (file_exists($full_path)) {
+            if (unlink($full_path)) {
+                error_log("[WeCoza Agents] Successfully deleted old file: {$file_path}");
+            } else {
+                error_log("[WeCoza Agents] Failed to delete old file: {$file_path}");
+            }
+        } else {
+            error_log("[WeCoza Agents] Old file not found for deletion: {$file_path}");
+        }
     }
 }
