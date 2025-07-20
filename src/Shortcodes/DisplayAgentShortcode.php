@@ -85,6 +85,10 @@ class DisplayAgentShortcode extends AbstractShortcode {
         
         // Initialize agent queries
         $this->agent_queries = new AgentQueries();
+        
+        // Register AJAX handlers
+        add_action('wp_ajax_wecoza_agents_paginate', array($this, 'handle_ajax_pagination'));
+        add_action('wp_ajax_nopriv_wecoza_agents_paginate', array($this, 'handle_ajax_pagination'));
     }
 
     /**
@@ -120,6 +124,23 @@ class DisplayAgentShortcode extends AbstractShortcode {
             WECOZA_AGENTS_VERSION,
             true
         );
+        
+        // AJAX pagination functionality
+        wp_enqueue_script(
+            'wecoza-agents-ajax-pagination',
+            WECOZA_AGENTS_JS_URL . 'agents-ajax-pagination' . $suffix . '.js',
+            array('jquery', 'wecoza-agents'),
+            WECOZA_AGENTS_VERSION,
+            true
+        );
+        
+        // Localize script for AJAX
+        wp_localize_script('wecoza-agents-ajax-pagination', 'wecoza_agents_ajax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('wecoza_agents_pagination'),
+            'loading_text' => __('Loading...', 'wecoza-agents-plugin'),
+            'error_text' => __('Error loading agents. Please try again.', 'wecoza-agents-plugin'),
+        ));
     }
 
     /**
@@ -477,5 +498,114 @@ class DisplayAgentShortcode extends AbstractShortcode {
                 )
             );
         }
+    }
+    
+    /**
+     * Handle AJAX pagination request
+     *
+     * @since 1.0.0
+     */
+    public function handle_ajax_pagination() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wecoza_agents_pagination')) {
+            wp_send_json_error(array('message' => __('Security check failed', 'wecoza-agents-plugin')));
+        }
+        
+        // Get request parameters
+        $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+        $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 10;
+        $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+        $orderby = isset($_POST['orderby']) ? sanitize_text_field($_POST['orderby']) : 'surname';
+        $order = isset($_POST['order']) ? strtoupper(sanitize_text_field($_POST['order'])) : 'ASC';
+        
+        // Set instance variables
+        $this->current_page = max(1, $page);
+        $this->per_page = max(1, min(100, $per_page));
+        $this->search_query = $search;
+        $this->sort_column = $this->map_sort_column($orderby);
+        $this->sort_order = in_array($order, array('ASC', 'DESC')) ? $order : 'ASC';
+        
+        // Get agents data
+        $agents = $this->get_agents();
+        $total_agents = $this->get_total_agents();
+        
+        // Calculate pagination
+        $total_pages = ceil($total_agents / $this->per_page);
+        $start_index = ($this->current_page - 1) * $this->per_page + 1;
+        $end_index = min($start_index + $this->per_page - 1, $total_agents);
+        
+        // Get columns configuration
+        $columns = $this->get_display_columns('');
+        
+        // Get statistics
+        $statistics = $this->get_agent_statistics();
+        
+        // Prepare response data
+        $response = array(
+            'agents' => $agents,
+            'total_agents' => $total_agents,
+            'current_page' => $this->current_page,
+            'per_page' => $this->per_page,
+            'total_pages' => $total_pages,
+            'start_index' => $start_index,
+            'end_index' => $end_index,
+            'statistics' => $statistics,
+        );
+        
+        // Capture the table HTML
+        ob_start();
+        $this->load_template('agent-display-table-rows.php', array(
+            'agents' => $agents,
+            'columns' => $columns,
+            'can_manage' => $this->can_manage_agents(),
+            'show_actions' => true,
+        ), 'display');
+        $table_html = ob_get_clean();
+        
+        // Capture the pagination HTML
+        ob_start();
+        $this->load_template('agent-pagination.php', array(
+            'current_page' => $this->current_page,
+            'total_pages' => $total_pages,
+            'per_page' => $this->per_page,
+            'start_index' => $start_index,
+            'end_index' => $end_index,
+            'total_agents' => $total_agents,
+        ), 'display');
+        $pagination_html = ob_get_clean();
+        
+        $response['table_html'] = $table_html;
+        $response['pagination_html'] = $pagination_html;
+        $response['statistics_html'] = $this->get_statistics_html($statistics);
+        
+        wp_send_json_success($response);
+    }
+    
+    /**
+     * Get statistics HTML
+     *
+     * @since 1.0.0
+     * @param array $statistics Statistics data
+     * @return string HTML
+     */
+    private function get_statistics_html($statistics) {
+        ob_start();
+        ?>
+        <div class="row g-0 flex-nowrap">
+            <?php foreach ($statistics as $stat_key => $stat_data) : ?>
+            <div class="col-auto <?php echo $stat_key === 'total_agents' ? 'pe-4' : 'px-4'; ?>">
+                <h6 class="text-body-tertiary">
+                    <?php echo esc_html($stat_data['label']); ?> : <?php echo esc_html($stat_data['count']); ?>
+                    <?php if (!empty($stat_data['badge'])) : ?>
+                    <div class="badge badge-phoenix fs-10 badge-phoenix-<?php echo esc_attr($stat_data['badge_type']); ?>">
+                        <?php echo esc_html($stat_data['badge']); ?>
+                    </div>
+                    <?php endif; ?>
+                </h6>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        return ob_get_clean();
     }
 }

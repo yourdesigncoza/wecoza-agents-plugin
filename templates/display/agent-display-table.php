@@ -29,13 +29,6 @@
    ?>
 <!-- Alert Container -->
 <div id="alert-container" class="alert-container"></div>
-<!-- Loader -->
-<div id="wecoza-agents-loader-container" style="display: none;">
-   <button id="wecoza-loader-02" class="btn btn-primary mt-7" type="button">
-   <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-   <?php esc_html_e('Loading...', 'wecoza-agents-plugin'); ?>
-   </button>
-</div>
 <!-- Main Content Container -->
 <div id="agents-container">
    <div class="table-responsive">
@@ -100,10 +93,10 @@
                         <thead class="border-bottom">
                            <tr>
                               <?php foreach ($columns as $col_key => $col_label) : ?>
-                              <th class="sort" data-field="<?php echo esc_attr($col_key); ?>">
+                              <th class="sort" data-field="<?php echo esc_attr($col_key); ?>" data-sortable="true">
                                  <div class="th-inner sortable both">
                                     <?php if ($atts['show_filters']) : ?>
-                                    <a href="<?php echo esc_url($this->get_sort_url($col_key)); ?>">
+                                    <a href="#" data-column="<?php echo esc_attr($col_key); ?>">
                                     <?php echo esc_html($col_label); ?>
                                     <?php 
                                     // Add appropriate icon based on column type
@@ -284,11 +277,10 @@
                      <div class="dropdown-menu">
                         <?php 
                         $page_sizes = array(10, 25, 50);
-                        foreach ($page_sizes as $size) : 
-                            $url = add_query_arg('per_page', $size, remove_query_arg('paged'));
-                        ?>
+                        foreach ($page_sizes as $size) : ?>
                         <a class="dropdown-item <?php echo ($size == $per_page) ? 'active' : ''; ?>" 
-                           href="<?php echo esc_url($url); ?>"><?php echo $size; ?></a>
+                           href="#"
+                           data-per-page="<?php echo $size; ?>"><?php echo $size; ?></a>
                         <?php endforeach; ?>
                      </div>
                   </span>
@@ -301,11 +293,12 @@
                   <?php if ($current_page > 1) : ?>
                   <li class="page-item page-pre">
                      <a class="page-link" aria-label="<?php esc_attr_e('previous page', 'wecoza-agents-plugin'); ?>" 
-                        href="<?php echo esc_url(add_query_arg('paged', $current_page - 1)); ?>">‹</a>
+                        href="#"
+                        data-page="<?php echo $current_page - 1; ?>">‹</a>
                   </li>
                   <?php else : ?>
                   <li class="page-item page-pre disabled">
-                     <span class="page-link">«</span>
+                     <span class="page-link">‹</span>
                   </li>
                   <?php endif; ?>
                   
@@ -317,7 +310,8 @@
                   if ($start_page > 1) : ?>
                   <li class="page-item">
                      <a class="page-link" aria-label="<?php esc_attr_e('to page 1', 'wecoza-agents-plugin'); ?>" 
-                        href="<?php echo esc_url(remove_query_arg('paged')); ?>">1</a>
+                        href="#"
+                        data-page="1">1</a>
                   </li>
                   <?php if ($start_page > 2) : ?>
                   <li class="page-item disabled">
@@ -332,7 +326,8 @@
                      <span class="page-link"><?php echo $i; ?></span>
                      <?php else : ?>
                      <a class="page-link" aria-label="<?php printf(esc_attr__('to page %d', 'wecoza-agents-plugin'), $i); ?>" 
-                        href="<?php echo esc_url(add_query_arg('paged', $i)); ?>"><?php echo $i; ?></a>
+                        href="#"
+                        data-page="<?php echo $i; ?>"><?php echo $i; ?></a>
                      <?php endif; ?>
                   </li>
                   <?php endfor; ?>
@@ -345,18 +340,20 @@
                   <?php endif; ?>
                   <li class="page-item">
                      <a class="page-link" aria-label="<?php printf(esc_attr__('to page %d', 'wecoza-agents-plugin'), $total_pages); ?>" 
-                        href="<?php echo esc_url(add_query_arg('paged', $total_pages)); ?>"><?php echo $total_pages; ?></a>
+                        href="#"
+                        data-page="<?php echo $total_pages; ?>"><?php echo $total_pages; ?></a>
                   </li>
                   <?php endif; ?>
                   
                   <?php if ($current_page < $total_pages) : ?>
                   <li class="page-item page-next">
                      <a class="page-link" aria-label="<?php esc_attr_e('next page', 'wecoza-agents-plugin'); ?>" 
-                        href="<?php echo esc_url(add_query_arg('paged', $current_page + 1)); ?>">›</a>
+                        href="#"
+                        data-page="<?php echo $current_page + 1; ?>">›</a>
                   </li>
                   <?php else : ?>
                   <li class="page-item page-next disabled">
-                     <span class="page-link">»</span>
+                     <span class="page-link">›</span>
                   </li>
                   <?php endif; ?>
                </ul>
