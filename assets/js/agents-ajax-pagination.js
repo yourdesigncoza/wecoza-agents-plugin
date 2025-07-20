@@ -12,6 +12,11 @@
     'use strict';
 
     /**
+     * Debug flag - set to false in production
+     */
+    const DEBUG_MODE = false;
+
+    /**
      * Pagination state
      */
     let currentState = {
@@ -48,7 +53,7 @@
         // Bind event handlers
         bindEventHandlers();
         
-        console.log('WeCoza Agents: AJAX pagination initialized');
+        if (DEBUG_MODE) console.log('WeCoza Agents: AJAX pagination initialized');
     }
 
     /**

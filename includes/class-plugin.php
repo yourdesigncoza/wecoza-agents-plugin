@@ -475,7 +475,8 @@ class Plugin {
         }
         
         return has_shortcode($post->post_content, 'wecoza_capture_agents') || 
-               has_shortcode($post->post_content, 'wecoza_display_agents');
+               has_shortcode($post->post_content, 'wecoza_display_agents') ||
+               has_shortcode($post->post_content, 'wecoza_single_agent');
     }
 
     /**

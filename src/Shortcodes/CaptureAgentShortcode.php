@@ -103,27 +103,6 @@ class CaptureAgentShortcode extends AbstractShortcode {
         //     WECOZA_AGENTS_VERSION,
         //     true
         // );
-        
-        // Add inline script to initialize Google Places when API is loaded
-        wp_add_inline_script('wecoza-agent-form-validation', '
-            jQuery(document).ready(function($) {
-                // Initialize Google Places when the API is ready
-                if (typeof google !== "undefined" && google.maps && google.maps.importLibrary) {
-                    initializeGooglePlaces();
-                } else {
-                    // Fallback: wait for the API to load
-                    var checkAPI = setInterval(function() {
-                        if (typeof google !== "undefined" && google.maps && google.maps.importLibrary) {
-                            clearInterval(checkAPI);
-                            initializeGooglePlaces();
-                        }
-                    }, 100);
-                }
-            });
-        ', 'after');
-        
-        // Update script dependencies
-        wp_script_add_data('wecoza-agents', 'deps', array('jquery'));
     }
 
     /**

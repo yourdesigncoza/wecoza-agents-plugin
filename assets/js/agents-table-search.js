@@ -13,6 +13,11 @@
     'use strict';
 
     /**
+     * Debug flag - set to false in production
+     */
+    const DEBUG_MODE = false;
+
+    /**
      * Search configuration
      */
     const SEARCH_CONFIG = {
@@ -52,7 +57,7 @@
     function agents_init_table_search() {
         // Prevent duplicate initialization
         if (isInitialized) {
-            console.log('WeCoza Agents: Already initialized, skipping duplicate initialization');
+            if (DEBUG_MODE) console.log('WeCoza Agents: Already initialized, skipping duplicate initialization');
             return;
         }
 
@@ -63,17 +68,17 @@
 
         // Validate elements exist
         if ($searchInput.length === 0) {
-            console.warn('WeCoza Agents: Search input not found');
+            if (DEBUG_MODE) console.warn('WeCoza Agents: Search input not found');
             return;
         }
 
         if ($table.length === 0) {
-            console.warn('WeCoza Agents: Table not found');
+            if (DEBUG_MODE) console.warn('WeCoza Agents: Table not found');
             return;
         }
 
         if ($tableRows.length === 0) {
-            console.warn('WeCoza Agents: No table rows found');
+            if (DEBUG_MODE) console.warn('WeCoza Agents: No table rows found');
             return;
         }
 
@@ -104,7 +109,7 @@
         // Mark as initialized
         isInitialized = true;
 
-        console.log('WeCoza Agents: Table search and pagination initialized successfully');
+        if (DEBUG_MODE) console.log('WeCoza Agents: Table search and pagination initialized successfully');
     }
 
     /**
