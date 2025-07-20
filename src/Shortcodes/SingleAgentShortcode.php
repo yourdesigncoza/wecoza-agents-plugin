@@ -46,7 +46,7 @@ class SingleAgentShortcode extends AbstractShortcode {
      * @since 1.0.0
      */
     protected function init() {
-        $this->tag = 'wecoza_display_single_agent';
+        $this->tag = 'wecoza_single_agent';
         $this->default_atts = array(
             'agent_id' => 0, // Can be overridden by URL parameter
         );
@@ -94,8 +94,7 @@ class SingleAgentShortcode extends AbstractShortcode {
         // Validate agent ID
         $agent_id = intval($agent_id);
         
-        // Sub-task 1.11: Pass all required variables to template using load_template() method
-        // Prepare template variables
+        // Initialize template variables
         $template_args = array(
             'agent_id' => $agent_id,
             'agent' => false,
@@ -105,6 +104,24 @@ class SingleAgentShortcode extends AbstractShortcode {
             'can_manage' => $this->can_manage_agents(),
             'date_format' => get_option('date_format'),
         );
+        
+        // Validate agent ID
+        if ($agent_id <= 0) {
+            $template_args['error'] = __('Invalid agent ID provided.', 'wecoza-agents-plugin');
+        } else {
+            // Load agent data
+            try {
+                $agent = $this->agent_queries->get_agent($agent_id);
+                
+                if ($agent) {
+                    $template_args['agent'] = $agent;
+                } else {
+                    $template_args['error'] = __('Agent not found.', 'wecoza-agents-plugin');
+                }
+            } catch (Exception $e) {
+                $template_args['error'] = __('Error loading agent data: ', 'wecoza-agents-plugin') . $e->getMessage();
+            }
+        }
         
         // Load the template
         $this->load_template('agent-single-display.php', $template_args, 'display');

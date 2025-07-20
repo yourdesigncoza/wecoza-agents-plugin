@@ -313,6 +313,11 @@ class Plugin {
         if (isset($this->components['display_shortcode'])) {
             add_shortcode('wecoza_display_agents', array($this->components['display_shortcode'], 'render'));
         }
+        
+        // Register single agent shortcode
+        if (isset($this->components['single_agent_shortcode'])) {
+            add_shortcode('wecoza_single_agent', array($this->components['single_agent_shortcode'], 'render'));
+        }
     }
 
     /**
