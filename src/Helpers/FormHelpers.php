@@ -50,6 +50,7 @@ class FormHelpers {
         
         // File upload fields
         'agreement_file_path' => 'signed_agreement_file',
+        'signed_agreement_file' => 'signed_agreement_file',
         'criminal_record_file' => 'criminal_record_file',
         
         // Primary key mapping
