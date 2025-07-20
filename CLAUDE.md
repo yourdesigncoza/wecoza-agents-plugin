@@ -38,11 +38,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Template Development**: Templates in `templates/` directory with theme override support
 
 ### Development Commands
-- **Code Standards**: `composer check-cs` (referenced in README, requires composer setup)
 - **No Build Process**: Direct file editing workflow - no npm, webpack, or compilation required
 - **Asset Loading**: Unminified files for development, minified versions for production
 - **Database Setup**: Automatic via plugin activation through WordPress admin
 - **Debug Logging**: Plugin logs to `/logs/` directory and WordPress debug log
+- **Plugin Activation**: Activate via WordPress admin or WP-CLI: `wp plugin activate wecoza-agents-plugin`
 
 ### Security Features
 - **Nonce Verification**: All forms use WordPress nonces
