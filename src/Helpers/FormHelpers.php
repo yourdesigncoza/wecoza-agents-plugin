@@ -21,6 +21,9 @@ class FormHelpers {
         'city_town' => 'city',
         'province_region' => 'province',
         'postal_code' => 'residential_postal_code',
+        // Database field names that should map to themselves for templates
+        'city' => 'city',
+        'province' => 'province',
         
         // Banking fields
         'account_number' => 'bank_account_number',
@@ -36,7 +39,7 @@ class FormHelpers {
         
         // Name fields
         'last_name' => 'surname',
-        'surname' => 'surname',
+        // Remove duplicate 'surname' => 'surname' mapping
         
         // Other fields that might need mapping
         'street_address' => 'residential_address_line',
