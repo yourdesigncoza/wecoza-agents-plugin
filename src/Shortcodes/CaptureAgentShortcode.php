@@ -765,7 +765,7 @@ class CaptureAgentShortcode extends AbstractShortcode {
             }
             
             // Log successful agent load for debugging
-            error_log("[WeCoza Agents] Successfully loaded agent {$agent_id} for editing");
+            // error_log("[WeCoza Agents] Successfully loaded agent {$agent_id} for editing");
             
             return $agent_data;
             
