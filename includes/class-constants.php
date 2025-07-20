@@ -49,7 +49,6 @@ class Constants {
         self::define('WECOZA_AGENTS_ASSETS_URL', self::get_constant('WECOZA_AGENTS_PLUGIN_URL') . 'assets/');
         self::define('WECOZA_AGENTS_CSS_URL', self::get_constant('WECOZA_AGENTS_ASSETS_URL') . 'css/');
         self::define('WECOZA_AGENTS_JS_URL', self::get_constant('WECOZA_AGENTS_ASSETS_URL') . 'js/');
-        self::define('WECOZA_AGENTS_IMAGES_URL', self::get_constant('WECOZA_AGENTS_ASSETS_URL') . 'images/');
         
         // Requirement constants
         self::define('WECOZA_AGENTS_MIN_PHP_VERSION', '7.4');
@@ -57,10 +56,6 @@ class Constants {
         
         // Database constants
         self::define('WECOZA_AGENTS_TABLE_PREFIX', 'wecoza_');
-        self::define('WECOZA_AGENTS_TABLE_AGENTS', self::get_constant('WECOZA_AGENTS_TABLE_PREFIX') . 'agents');
-        self::define('WECOZA_AGENTS_TABLE_AGENT_META', self::get_constant('WECOZA_AGENTS_TABLE_PREFIX') . 'agent_meta');
-        self::define('WECOZA_AGENTS_TABLE_AGENT_NOTES', self::get_constant('WECOZA_AGENTS_TABLE_PREFIX') . 'agent_notes');
-        self::define('WECOZA_AGENTS_TABLE_AGENT_ABSENCES', self::get_constant('WECOZA_AGENTS_TABLE_PREFIX') . 'agent_absences');
         
         // Option name constants
         self::define('WECOZA_AGENTS_OPTIONS_PREFIX', 'wecoza_agents_');
@@ -68,19 +63,8 @@ class Constants {
         self::define('WECOZA_AGENTS_DB_VERSION_OPTION', self::get_constant('WECOZA_AGENTS_OPTIONS_PREFIX') . 'db_version');
         self::define('WECOZA_AGENTS_SETTINGS_OPTION', self::get_constant('WECOZA_AGENTS_OPTIONS_PREFIX') . 'settings');
         
-        // Capability constants
-        self::define('WECOZA_AGENTS_CAPABILITY_MANAGE', 'manage_wecoza_agents');
-        self::define('WECOZA_AGENTS_CAPABILITY_VIEW', 'view_wecoza_agents');
-        self::define('WECOZA_AGENTS_CAPABILITY_EDIT', 'edit_wecoza_agents');
-        self::define('WECOZA_AGENTS_CAPABILITY_DELETE', 'delete_wecoza_agents');
-        
         // Cache constants
         self::define('WECOZA_AGENTS_CACHE_GROUP', 'wecoza_agents');
-        self::define('WECOZA_AGENTS_CACHE_EXPIRATION', 3600); // 1 hour
-        
-        // Debug constants
-        self::define('WECOZA_AGENTS_DEBUG', WP_DEBUG);
-        self::define('WECOZA_AGENTS_DEBUG_LOG', WP_DEBUG_LOG);
     }
     
     /**

@@ -462,8 +462,7 @@ class BackwardsCompatibility {
      */
     private function check_assets_compatible() {
         // Check if plugin assets are available
-        return file_exists(WECOZA_AGENTS_PLUGIN_DIR . 'assets/js/agents-app.js') &&
-               file_exists(WECOZA_AGENTS_PLUGIN_DIR . 'assets/css/agents-extracted.css');
+        return file_exists(WECOZA_AGENTS_PLUGIN_DIR . 'assets/js/agents-app.js');
     }
 
     /**

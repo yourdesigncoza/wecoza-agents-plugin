@@ -112,8 +112,8 @@ abstract class AbstractShortcode {
         // Parse attributes
         $atts = $this->parse_attributes($atts);
         
-        // Note: Assets are enqueued conditionally via wp_enqueue_scripts hook
-        // to ensure they only load when the shortcode is present on the page
+        // Enqueue assets
+        $this->enqueue_assets();
         
         // Start output buffering
         ob_start();
@@ -360,13 +360,13 @@ abstract class AbstractShortcode {
         // Use minified versions unless in debug mode
         $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
         
-        // CSS
-        wp_enqueue_style(
-            'wecoza-agents',
-            WECOZA_AGENTS_CSS_URL . 'agents-extracted' . $suffix . '.css',
-            array(),
-            WECOZA_AGENTS_VERSION
-        );
+        // // CSS
+        // wp_enqueue_style(
+        //     'wecoza-agents',
+        //     WECOZA_AGENTS_CSS_URL . 'agents-extracted' . $suffix . '.css',
+        //     array(),
+        //     WECOZA_AGENTS_VERSION
+        // );
         
         // JavaScript
         wp_enqueue_script(

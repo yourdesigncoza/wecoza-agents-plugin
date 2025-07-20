@@ -114,7 +114,7 @@ class DisplayAgentShortcode extends AbstractShortcode {
         $suffix = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
         
         // Additional assets for display table
-        wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', array('jquery'), '5.1.3', true);
+        wp_enqueue_script('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', array('jquery'), WECOZA_AGENTS_VERSION, true);
         
         // Table search functionality
         wp_enqueue_script(

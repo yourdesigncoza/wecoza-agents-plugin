@@ -284,7 +284,7 @@ class Plugin {
      * @since 1.0.0
      */
     private function define_public_hooks() {
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_public_styles'));
+       // add_action('wp_enqueue_scripts', array($this, 'enqueue_public_styles'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_public_scripts'));
         add_action('init', array($this, 'init'));
     }
@@ -413,20 +413,20 @@ class Plugin {
      *
      * @since 1.0.0
      */
-    public function enqueue_public_styles() {
-        // Check if our shortcodes are present
-        if (!$this->has_shortcode()) {
-            return;
-        }
+    // public function enqueue_public_styles() {
+    //     // Check if our shortcodes are present
+    //     if (!$this->has_shortcode()) {
+    //         return;
+    //     }
         
-        // Enqueue main styles
-        wp_enqueue_style(
-            'wecoza-agents',
-            WECOZA_AGENTS_CSS_URL . 'agents-extracted.css',
-            array(),
-            $this->version
-        );
-    }
+    //     // Enqueue main styles
+    //     wp_enqueue_style(
+    //         'wecoza-agents',
+    //         WECOZA_AGENTS_CSS_URL . 'agents-extracted.css',
+    //         array(),
+    //         $this->version
+    //     );
+    // }
 
     /**
      * Enqueue public scripts
@@ -444,7 +444,7 @@ class Plugin {
             'wecoza-agents',
             WECOZA_AGENTS_JS_URL . 'agents-app.js',
             array('jquery'),
-            $this->version,
+            WECOZA_AGENTS_VERSION,
             true
         );
         

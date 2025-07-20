@@ -87,7 +87,7 @@ class CaptureAgentShortcode extends AbstractShortcode {
                 'google-maps-api',
                 'https://maps.googleapis.com/maps/api/js?key=' . esc_attr($google_maps_api_key) . '&libraries=places&loading=async',
                 array(),
-                null,
+                WECOZA_AGENTS_VERSION,
                 true
             );
         } else {
@@ -96,13 +96,13 @@ class CaptureAgentShortcode extends AbstractShortcode {
         }
 
         // Enqueue agent form validation
-        wp_enqueue_script(
-            'wecoza-agent-form-validation',
-            WECOZA_AGENTS_PLUGIN_URL . 'assets/js/agent-form-validation.js',
-            array('jquery', 'google-maps-api'),
-            '1.0.0',
-            true
-        );
+        // wp_enqueue_script(
+        //     'wecoza-agent-form-validation',
+        //     WECOZA_AGENTS_PLUGIN_URL . 'assets/js/agent-form-validation.js',
+        //     array('jquery', 'google-maps-api'),
+        //     WECOZA_AGENTS_VERSION,
+        //     true
+        // );
         
         // Add inline script to initialize Google Places when API is loaded
         wp_add_inline_script('wecoza-agent-form-validation', '

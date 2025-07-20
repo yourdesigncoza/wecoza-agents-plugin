@@ -166,8 +166,8 @@ $settings = wp_parse_args($settings, $defaults);
         'agents-functions.php',
         'agents-capture-shortcode.php',
         'agents-display-shortcode.php',
-        'js/agents-app.js',
-        'agents-extracted.css'
+        'js/agents-app.js'
+        // 'agents-extracted.css'
     );
     
     $theme_agent_dir = get_stylesheet_directory() . '/assets/agents/';
