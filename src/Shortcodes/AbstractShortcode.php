@@ -112,8 +112,8 @@ abstract class AbstractShortcode {
         // Parse attributes
         $atts = $this->parse_attributes($atts);
         
-        // Enqueue assets
-        $this->enqueue_assets();
+        // Note: Assets are enqueued conditionally via wp_enqueue_scripts hook
+        // to ensure they only load when the shortcode is present on the page
         
         // Start output buffering
         ob_start();

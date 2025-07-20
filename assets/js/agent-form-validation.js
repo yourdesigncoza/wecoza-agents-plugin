@@ -163,9 +163,20 @@ jQuery(document).ready(function($) {
     
     // Auto-generate initials from first name, second name, and surname
     function generateInitials() {
-        var firstName = $('#first_name').val().trim();
-        var secondName = $('#second_name').val().trim();
-        var surname = $('#surname').val().trim();
+        // Check if form elements exist before proceeding
+        var $firstName = $('#first_name');
+        var $secondName = $('#second_name');
+        var $surname = $('#surname');
+        var $initials = $('#initials');
+        
+        // Exit if required form fields don't exist
+        if (!$firstName.length || !$surname.length || !$initials.length) {
+            return;
+        }
+        
+        var firstName = $firstName.val() ? $firstName.val().trim() : '';
+        var secondName = $secondName.val() ? $secondName.val().trim() : '';
+        var surname = $surname.val() ? $surname.val().trim() : '';
         var initials = '';
         
         if (firstName) {
@@ -178,14 +189,16 @@ jQuery(document).ready(function($) {
             initials += surname.charAt(0).toUpperCase();
         }
         
-        $('#initials').val(initials);
+        $initials.val(initials);
     }
     
-    // Bind initials generation to name field changes
-    $('#first_name, #second_name, #surname').on('input', generateInitials);
-    
-    // Generate initials on page load if names are pre-filled
-    generateInitials();
+    // Bind initials generation to name field changes (only if elements exist)
+    if ($('#first_name').length || $('#second_name').length || $('#surname').length) {
+        $('#first_name, #second_name, #surname').on('input', generateInitials);
+        
+        // Generate initials on page load if names are pre-filled
+        generateInitials();
+    }
     
     // Google Places Autocomplete initialization - handled by WordPress enqueue system
 });
