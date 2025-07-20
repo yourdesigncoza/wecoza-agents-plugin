@@ -1,3 +1,46 @@
-Data for " ... ?update&agent_id=30 "
-
-[{"agent_id":30,"first_name":"John","initials":"JMM","surname":"Montgomery","gender":"M","race":"White","sa_id_no":"6702155114080","passport_number":"","tel_number":"0791778896","email_address":"test@test.com","residential_address_line":"66 Porterfield Road","residential_suburb":"Blouberg Rise","residential_postal_code":"7441","preferred_working_area_1":1,"preferred_working_area_2":2,"preferred_working_area_3":3,"highest_qualification":"Matric","sace_number":"35623235cffg","sace_registration_date":"2025-07-02","sace_expiry_date":"2025-08-06","quantum_assessment":"66.00","agent_training_date":"2025-07-08","bank_name":"FNB","bank_branch_code":"1151","bank_account_number":"5151255155","signed_agreement_date":"2025-07-08","agent_notes":null,"created_at":"2025-07-19 12:00:59","updated_at":"2025-07-19 12:01:01.290967","title":"Mr","id_type":"sa_id","address_line_2":"Under The Tree","criminal_record_date":"2025-07-10","criminal_record_file":"/agents/agent-30-criminal_record_file-1752926460.pdf","province":"Western Cape","city":"Cape Town","phase_registered":"Foundation","subjects_registered":"Maths2","account_holder":"Koos","account_type":"Savings","status":"active","created_by":1,"updated_by":1,"second_name":"Michael","signed_agreement_file":"/agents/agent-30-signed_agreement_file-1752926459.pdf","quantum_maths_score":77,"quantum_science_score":88}]
+jquery-migrate.min.js?ver=3.4.1:2 JQMIGRATE: Migrate is installed, version 3.4.1
+new-agents/?update&agent_id=30:868 The specified value "undefined" does not conform to the required format, "yyyy-MM-dd".
+get @ new-agents/?update&agent_id=30:868
+protectDateField @ new-agents/?update&agent_id=30:832
+setTimeout
+(anonymous) @ new-agents/?update&agent_id=30:882
+(anonymous) @ new-agents/?update&agent_id=30:884
+new-agents/?update&agent_id=30:833 [WeCoza] Restoring signed_agreement_date value: 2025-07-08
+new-agents/?update&agent_id=30:858 Uncaught TypeError: Cannot redefine property: value
+    at Object.defineProperty (<anonymous>)
+    at protectDateField (new-agents/?update&agent_id=30:858:32)
+protectDateField @ new-agents/?update&agent_id=30:858
+setTimeout
+(anonymous) @ new-agents/?update&agent_id=30:882
+(anonymous) @ new-agents/?update&agent_id=30:884
+new-agents/?update&agent_id=30:868 The specified value "undefined" does not conform to the required format, "yyyy-MM-dd".
+get @ new-agents/?update&agent_id=30:868
+protectDateField @ new-agents/?update&agent_id=30:832
+new-agents/?update&agent_id=30:833 [WeCoza] Restoring signed_agreement_date value: 2025-07-08
+new-agents/?update&agent_id=30:858 Uncaught TypeError: Cannot redefine property: value
+    at Object.defineProperty (<anonymous>)
+    at HTMLDocument.protectDateField (new-agents/?update&agent_id=30:858:32)
+protectDateField @ new-agents/?update&agent_id=30:858
+new-agents/?update&agent_id=30:861 [WeCoza] Blocking attempt to clear signed_agreement_date
+new-agents/?update&agent_id=30:868 The specified value "undefined" does not conform to the required format, "yyyy-MM-dd".
+get @ new-agents/?update&agent_id=30:868
+protectDateField @ new-agents/?update&agent_id=30:832
+setTimeout
+(anonymous) @ new-agents/?update&agent_id=30:883
+(anonymous) @ new-agents/?update&agent_id=30:884
+new-agents/?update&agent_id=30:833 [WeCoza] Restoring signed_agreement_date value: 2025-07-08
+new-agents/?update&agent_id=30:858 Uncaught TypeError: Cannot redefine property: value
+    at Object.defineProperty (<anonymous>)
+    at protectDateField (new-agents/?update&agent_id=30:858:32)
+protectDateField @ new-agents/?update&agent_id=30:858
+setTimeout
+(anonymous) @ new-agents/?update&agent_id=30:883
+(anonymous) @ new-agents/?update&agent_id=30:884
+main.js:301  GET https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true net::ERR_BLOCKED_BY_CLIENT
+_.B.send @ main.js:301
+$ca @ main.js:280
+bda @ main.js:272
+await in bda
+google.maps.Load @ js?key=AIzaSyDzhEM7ISIJ8Sb5M1oyCjYQCyFnRcYloEQ&libraries=places&loading=async&ver=92:38
+(anonymous) @ main.js:515
+(anonymous) @ main.js:515

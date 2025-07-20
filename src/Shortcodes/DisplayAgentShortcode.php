@@ -329,9 +329,13 @@ class DisplayAgentShortcode extends AbstractShortcode {
     public function get_edit_url($agent_id) {
         // Get the capture form page URL
         // In production, this would be configurable
-        $capture_page_url = home_url('/agent-capture/');
+        $capture_page_url = home_url('/new-agents/');
         
-        return add_query_arg('agent_id', $agent_id, $capture_page_url);
+        // Add both 'update' and 'agent_id' parameters
+        return add_query_arg(array(
+            'update' => '',
+            'agent_id' => $agent_id
+        ), $capture_page_url);
     }
 
     /**

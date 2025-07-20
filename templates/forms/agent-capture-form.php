@@ -432,7 +432,68 @@ use WeCoza\Agents\Helpers\FormHelpers;
         <div class="col-md-2">
             <label for="signed_agreement_date" class="form-label">Agreement Signed Date <span class="text-danger">*</span></label>
             <input type="date" id="signed_agreement_date" name="signed_agreement_date" class="form-control form-control-sm" 
-                   value="<?php echo FormHelpers::get_field_value($agent, 'signed_agreement_date'); ?>" required>
+                   value="<?php echo FormHelpers::get_field_value($agent, 'signed_agreement_date'); ?>" 
+                   data-original-value="<?php echo esc_attr(FormHelpers::get_field_value($agent, 'signed_agreement_date')); ?>"
+                   autocomplete="off" required>
+            <?php if ($mode === 'edit' && !empty(FormHelpers::get_field_value($agent, 'signed_agreement_date'))) : ?>
+            <script>
+                // Simplified defensive script to protect the signed_agreement_date value
+                (function() {
+                    var dateField = document.getElementById('signed_agreement_date');
+                    if (!dateField) return;
+                    
+                    var originalValue = dateField.getAttribute('data-original-value');
+                    if (!originalValue) {
+                        console.log('[WeCoza] No original value found for signed_agreement_date');
+                        return;
+                    }
+                    
+                    console.log('[WeCoza] Protecting signed_agreement_date with value:', originalValue);
+                    
+                    // Function to restore value
+                    var restoreValue = function() {
+                        if (!dateField.value || dateField.value === '') {
+                            dateField.value = originalValue;
+                            console.log('[WeCoza] Restored signed_agreement_date:', originalValue);
+                        }
+                    };
+                    
+                    // Restore immediately
+                    restoreValue();
+                    
+                    // Also restore on focus/blur events
+                    dateField.addEventListener('focus', function() {
+                        if (!this.value) {
+                            this.value = originalValue;
+                        }
+                    });
+                    
+                    dateField.addEventListener('blur', function() {
+                        if (!this.value) {
+                            this.value = originalValue;
+                        }
+                    });
+                    
+                    // Keep checking and restoring for 2 seconds
+                    var checkCount = 0;
+                    var interval = setInterval(function() {
+                        checkCount++;
+                        if (!dateField.value || dateField.value === '') {
+                            dateField.value = originalValue;
+                            console.log('[WeCoza] Restored value (check #' + checkCount + ')');
+                        }
+                    }, 50);
+                    
+                    // Stop after 2 seconds
+                    setTimeout(function() {
+                        clearInterval(interval);
+                        console.log('[WeCoza] Stopped monitoring after ' + checkCount + ' checks');
+                        // Final restore
+                        restoreValue();
+                    }, 2000);
+                })();
+            </script>
+            <?php endif; ?>
         </div>
         
         <div class="col-md-4">
