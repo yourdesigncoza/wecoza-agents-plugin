@@ -114,7 +114,8 @@ class SingleAgentShortcode extends AbstractShortcode {
                 $agent = $this->agent_queries->get_agent($agent_id);
                 
                 if ($agent) {
-                    $template_args['agent'] = $agent;
+                    // Transform database field names to template field names
+                    $template_args['agent'] = \WeCoza\Agents\Helpers\FormHelpers::map_database_to_form($agent);
                 } else {
                     $template_args['error'] = __('Agent not found.', 'wecoza-agents-plugin');
                 }
