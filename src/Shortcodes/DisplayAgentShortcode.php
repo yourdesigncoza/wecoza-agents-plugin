@@ -359,7 +359,7 @@ class DisplayAgentShortcode extends AbstractShortcode {
             $base_url = get_permalink($single_agent_page_id);
         } else {
             // Fallback to a default path
-            // This assumes a page with slug 'agent-view' exists
+            // This assumes a page with slug 'agent-view' exists with [wecoza_display_single_agent] shortcode
             $base_url = home_url('/app/agent-view/');
         }
         

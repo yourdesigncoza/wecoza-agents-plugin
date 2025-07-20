@@ -41,25 +41,25 @@ function wecoza_agents_uninstall() {
     }
     
     // Remove database tables
-    //wecoza_agents_remove_tables();
+    wecoza_agents_remove_tables();
     
     // Remove options
-    //wecoza_agents_remove_options();
+    wecoza_agents_remove_options();
     
     // Remove user capabilities
-    //wecoza_agents_remove_capabilities();
+    wecoza_agents_remove_capabilities();
     
     // Remove uploaded files
-    //wecoza_agents_remove_uploads();
+    wecoza_agents_remove_uploads();
     
     // Clear all caches
     wecoza_agents_clear_all_caches();
     
     // Remove scheduled events
-    //wecoza_agents_remove_scheduled_events();
+    wecoza_agents_remove_scheduled_events();
     
     // Clean up user meta
-    //wecoza_agents_clean_user_meta();
+    wecoza_agents_clean_user_meta();
     
     // Clean up post meta
     wecoza_agents_clean_post_meta();

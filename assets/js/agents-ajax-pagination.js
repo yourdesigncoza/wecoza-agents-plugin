@@ -52,8 +52,6 @@
         
         // Bind event handlers
         bindEventHandlers();
-        
-        if (DEBUG_MODE) console.log('WeCoza Agents: AJAX pagination initialized');
     }
 
     /**

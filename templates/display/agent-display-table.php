@@ -212,41 +212,18 @@
                               <?php endforeach; ?>
                               <?php if ($atts['show_actions']) : ?>
                               <td class="text-center">
-                                 <div class="dropdown">
-                                    <button class="btn btn-link text-body btn-sm dropdown-toggle" style="text-decoration: none;" type="button" id="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                       <i class="bi bi-three-dots"></i>
+                                 <div class="btn-group btn-group-sm" role="group">
+                                    <a href="<?php echo esc_url($this->get_view_url($agent['id'])); ?>" class="btn btn-phoenix-secondary" title="View">
+                                       <i class="bi bi-eye"></i>
+                                    </a>
+                                    <?php if ($can_manage) : ?>
+                                    <a href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>" class="btn btn-phoenix-primary" title="Edit">
+                                       <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-phoenix-danger delete-agent-btn" data-agent-id="<?php echo esc_attr($agent['id']); ?>" title="Delete">
+                                       <i class="bi bi-trash"></i>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?php echo esc_attr($agent['id']); ?>">
-                                       <li>
-                                          <?php 
-                                          // Sub-task 3.4: Locate View Details button
-                                          // Sub-task 3.5: Remove modal attributes
-                                          // Sub-task 3.6: Change button to anchor tag
-                                          // Sub-task 3.7: Update to use get_view_url() method
-                                          ?>
-                                          <a class="dropdown-item view-agent-details" 
-                                             href="<?php echo esc_url($this->get_view_url($agent['id'])); ?>">
-                                             <?php esc_html_e('View Details', 'wecoza-agents-plugin'); ?>
-                                             <i class="bi bi-eye ms-2"></i>
-                                          </a>
-                                       </li>
-                                       <?php if ($can_manage) : ?>
-                                       <li>
-                                          <a class="dropdown-item" href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>">
-                                             <?php esc_html_e('Edit Agent', 'wecoza-agents-plugin'); ?>
-                                             <i class="bi bi-pencil ms-2"></i>
-                                          </a>
-                                       </li>
-                                       <li><hr class="dropdown-divider"></li>
-                                       <li>
-                                          <button class="dropdown-item text-danger delete-agent-btn" 
-                                             data-id="<?php echo esc_attr($agent['id']); ?>">
-                                             <?php esc_html_e('Delete Agent', 'wecoza-agents-plugin'); ?>
-                                             <i class="bi bi-trash ms-2"></i>
-                                          </button>
-                                       </li>
-                                       <?php endif; ?>
-                                    </ul>
+                                    <?php endif; ?>
                                  </div>
                               </td>
                               <?php endif; ?>

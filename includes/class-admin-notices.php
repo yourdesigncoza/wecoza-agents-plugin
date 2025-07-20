@@ -244,7 +244,6 @@ class AdminNotices {
             '/assets/agents/agents-display-shortcode.php', 
             '/assets/agents/agents-functions.php',
             '/assets/agents/js/agents-app.js',
-            //'/assets/agents/agents-extracted.css',
             '/app/Controllers/AgentController.php'
         );
         

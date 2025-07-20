@@ -57,7 +57,6 @@
     function agents_init_table_search() {
         // Prevent duplicate initialization
         if (isInitialized) {
-            if (DEBUG_MODE) console.log('WeCoza Agents: Already initialized, skipping duplicate initialization');
             return;
         }
 
@@ -108,8 +107,6 @@
 
         // Mark as initialized
         isInitialized = true;
-
-        if (DEBUG_MODE) console.log('WeCoza Agents: Table search and pagination initialized successfully');
     }
 
     /**

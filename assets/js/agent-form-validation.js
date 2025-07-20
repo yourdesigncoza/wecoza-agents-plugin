@@ -64,26 +64,12 @@ jQuery(document).ready(function($) {
     var forms = document.querySelectorAll('.needs-validation');
     Array.prototype.slice.call(forms).forEach(function(form) {
         form.addEventListener('submit', function(event) {
-            // Log form data before submission
-            console.log('[WeCoza Agents DEBUG] Form submission started');
-            
             // Collect all form data
             var formData = new FormData(form);
             var formDataObj = {};
             for (var [key, value] of formData.entries()) {
                 formDataObj[key] = value;
             }
-            console.log('[WeCoza Agents DEBUG] Form data being submitted:', formDataObj);
-            
-            // Specifically log address-related fields for debugging
-            console.log('[WeCoza Agents DEBUG] Address fields:', {
-                'address_line_1': formDataObj.address_line_1,
-                'residential_suburb': formDataObj.residential_suburb,
-                'city_town': formDataObj.city_town,
-                'province_region': formDataObj.province_region,
-                'postal_code': formDataObj.postal_code,
-                'residential_town_id': formDataObj.residential_town_id
-            });
             // Custom validation for ID fields
             var idType = $('input[name="id_type"]:checked').val();
             if (idType === 'sa_id') {
@@ -278,16 +264,6 @@ async function initializeGooglePlaces() {
                 }
             }
             
-            // Log parsed address components
-            console.log('[WeCoza Agents DEBUG] Google Maps parsed address components:', {
-                'streetNumber': streetNumber,
-                'route': route,
-                'suburb': suburb,
-                'city': city,
-                'province': province,
-                'postalCode': postalCode
-            });
-            
             // Populate form fields
             var streetAddress = streetNumber ? streetNumber + ' ' + route : route;
             jQuery('#address_line_1').val(streetAddress).trigger('change');
@@ -312,14 +288,6 @@ async function initializeGooglePlaces() {
                 jQuery('#province_region').val(provinceMap[province]).trigger('change');
             }
             
-            // Log what was populated in the form
-            console.log('[WeCoza Agents DEBUG] Form fields populated from Google Maps:', {
-                'address_line_1': streetAddress,
-                'residential_suburb': suburb,
-                'city_town': city,
-                'province_region': provinceMap[province] || province,
-                'postal_code': postalCode
-            });
         });
         
         // Handle errors
