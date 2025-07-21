@@ -212,15 +212,15 @@
                               <?php endforeach; ?>
                               <?php if ($atts['show_actions']) : ?>
                               <td class="text-center">
-                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="<?php echo esc_url($this->get_view_url($agent['id'])); ?>" class="btn btn-phoenix-secondary" title="View">
+                                 <div class="d-flex justify-content-center gap-2" role="group">
+                                    <a href="<?php echo esc_url($this->get_view_url($agent['id'])); ?>" class="btn btn-sm btn-outline-secondary border-0" title="View">
                                        <i class="bi bi-eye"></i>
                                     </a>
                                     <?php if ($can_manage) : ?>
-                                    <a href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>" class="btn btn-phoenix-primary" title="Edit">
+                                    <a href="<?php echo esc_url($this->get_edit_url($agent['id'])); ?>" class="btn btn-sm btn-outline-secondary border-0" title="Edit">
                                        <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-phoenix-danger delete-agent-btn" data-agent-id="<?php echo esc_attr($agent['id']); ?>" title="Delete">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary border-0" data-agent-id="<?php echo esc_attr($agent['id']); ?>" title="Delete">
                                        <i class="bi bi-trash"></i>
                                     </button>
                                     <?php endif; ?>

@@ -62,18 +62,18 @@ if (!empty($agents)) :
         <td class="text-center">
             <div class="btn-group btn-group-sm" role="group">
                 <a href="<?php echo esc_url(add_query_arg('agent_id', $agent['id'], home_url('/app/all-classes/'))); ?>" 
-                   class="btn btn-phoenix-secondary"
+                   class="btn btn-sm btn-outline-secondary border-0"
                    title="<?php esc_attr_e('View', 'wecoza-agents-plugin'); ?>">
                     <i class="bi bi-eye"></i>
                 </a>
                 <?php if ($can_manage) : ?>
                 <a href="<?php echo esc_url(add_query_arg('agent_id', $agent['id'], home_url('/agent-capture/'))); ?>" 
-                   class="btn btn-phoenix-primary"
+                   class="btn btn-sm btn-outline-secondary border-0"
                    title="<?php esc_attr_e('Edit', 'wecoza-agents-plugin'); ?>">
                     <i class="bi bi-pencil"></i>
                 </a>
                 <button type="button" 
-                        class="btn btn-phoenix-danger delete-agent-btn" 
+                        class="btn btn-sm btn-outline-secondary border-0" 
                         data-agent-id="<?php echo esc_attr($agent['id']); ?>"
                         title="<?php esc_attr_e('Delete', 'wecoza-agents-plugin'); ?>">
                     <i class="bi bi-trash"></i>
