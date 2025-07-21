@@ -89,6 +89,8 @@ class DisplayAgentShortcode extends AbstractShortcode {
         // Register AJAX handlers
         add_action('wp_ajax_wecoza_agents_paginate', array($this, 'handle_ajax_pagination'));
         add_action('wp_ajax_nopriv_wecoza_agents_paginate', array($this, 'handle_ajax_pagination'));
+        add_action('wp_ajax_wecoza_delete_agent', array($this, 'handle_ajax_delete'));
+        add_action('wp_ajax_nopriv_wecoza_delete_agent', array($this, 'handle_ajax_delete'));
     }
 
     /**
@@ -134,12 +136,30 @@ class DisplayAgentShortcode extends AbstractShortcode {
             true
         );
         
+        // Agent delete functionality
+        wp_enqueue_script(
+            'wecoza-agents-delete',
+            WECOZA_AGENTS_JS_URL . 'agent-delete.js',
+            array('jquery', 'wecoza-agents'),
+            WECOZA_AGENTS_VERSION,
+            true
+        );
+        
         // Localize script for AJAX
         wp_localize_script('wecoza-agents-ajax-pagination', 'wecoza_agents_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wecoza_agents_pagination'),
             'loading_text' => __('Loading...', 'wecoza-agents-plugin'),
             'error_text' => __('Error loading agents. Please try again.', 'wecoza-agents-plugin'),
+        ));
+        
+        // Localize script for delete functionality
+        wp_localize_script('wecoza-agents-delete', 'wecoZaAgentsDelete', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('wecoza_delete_agent'),
+            'confirmText' => __('Are you sure you want to delete this agent? This action cannot be undone.', 'wecoza-agents-plugin'),
+            'successText' => __('Agent deleted successfully.', 'wecoza-agents-plugin'),
+            'errorText' => __('Error deleting agent. Please try again.', 'wecoza-agents-plugin'),
         ));
     }
 
@@ -611,5 +631,46 @@ class DisplayAgentShortcode extends AbstractShortcode {
         </div>
         <?php
         return ob_get_clean();
+    }
+    
+    /**
+     * Handle AJAX delete request
+     *
+     * @since 1.0.0
+     */
+    public function handle_ajax_delete() {
+        // Verify nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wecoza_delete_agent')) {
+            wp_send_json_error(array('message' => __('Security check failed', 'wecoza-agents-plugin')));
+        }
+        
+        // Check permissions
+        if (!$this->can_manage_agents()) {
+            wp_send_json_error(array('message' => __('You do not have permission to delete agents.', 'wecoza-agents-plugin')));
+        }
+        
+        // Get and validate agent ID
+        $agent_id = isset($_POST['agent_id']) ? intval($_POST['agent_id']) : 0;
+        if (!$agent_id) {
+            wp_send_json_error(array('message' => __('Invalid agent ID.', 'wecoza-agents-plugin')));
+        }
+        
+        try {
+            // Attempt to delete agent (soft delete)
+            $success = $this->agent_queries->delete_agent($agent_id);
+            
+            if ($success) {
+                wp_send_json_success(array(
+                    'message' => __('Agent deleted successfully.', 'wecoza-agents-plugin'),
+                    'agent_id' => $agent_id
+                ));
+            } else {
+                wp_send_json_error(array('message' => __('Failed to delete agent. Please try again.', 'wecoza-agents-plugin')));
+            }
+            
+        } catch (Exception $e) {
+            error_log('WeCoza Agents: Error deleting agent - ' . $e->getMessage());
+            wp_send_json_error(array('message' => __('An error occurred while deleting the agent.', 'wecoza-agents-plugin')));
+        }
     }
 }
