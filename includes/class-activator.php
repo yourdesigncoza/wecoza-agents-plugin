@@ -116,45 +116,45 @@ class Activator {
         // PostgreSQL table creation SQL
         $sql = "
         CREATE TABLE IF NOT EXISTS agents (
-            id SERIAL PRIMARY KEY,
+            agent_id SERIAL PRIMARY KEY,
             title VARCHAR(50),
             first_name VARCHAR(255) NOT NULL,
-            last_name VARCHAR(255) NOT NULL,
+            surname VARCHAR(255) NOT NULL,
             gender VARCHAR(20),
             race VARCHAR(50),
-            id_number VARCHAR(20),
+            sa_id_no VARCHAR(20),
             passport_number VARCHAR(50),
-            phone VARCHAR(50) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            street_address TEXT,
+            tel_number VARCHAR(50) NOT NULL,
+            email_address VARCHAR(255) NOT NULL,
+            residential_address_line TEXT,
             city VARCHAR(255),
             province VARCHAR(255),
-            postal_code VARCHAR(20),
+            residential_postal_code VARCHAR(20),
             sace_number VARCHAR(100),
             phase_registered VARCHAR(100),
             subjects_registered TEXT,
             quantum_maths_score INT DEFAULT 0,
             quantum_science_score INT DEFAULT 0,
             criminal_record_date DATE,
-            agreement_file_path VARCHAR(500),
+            signed_agreement_file VARCHAR(500),
             bank_name VARCHAR(255),
             account_holder VARCHAR(255),
-            account_number VARCHAR(50),
-            branch_code VARCHAR(20),
+            bank_account_number VARCHAR(50),
+            bank_branch_code VARCHAR(20),
             account_type VARCHAR(50),
-            preferred_areas TEXT,
+            residential_suburb VARCHAR(255),
             status VARCHAR(50) DEFAULT 'active',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             created_by INT,
             updated_by INT,
-            CONSTRAINT email_unique UNIQUE (email),
-            CONSTRAINT id_number_unique UNIQUE (id_number)
+            CONSTRAINT email_unique UNIQUE (email_address),
+            CONSTRAINT id_number_unique UNIQUE (sa_id_no)
         );
 
         CREATE TABLE IF NOT EXISTS agent_meta (
-            id SERIAL PRIMARY KEY,
-            agent_id INT NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+            meta_id SERIAL PRIMARY KEY,
+            agent_id INT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
             meta_key VARCHAR(255) NOT NULL,
             meta_value TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -162,8 +162,8 @@ class Activator {
         );
 
         CREATE TABLE IF NOT EXISTS agent_notes (
-            id SERIAL PRIMARY KEY,
-            agent_id INT NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+            note_id SERIAL PRIMARY KEY,
+            agent_id INT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
             note TEXT NOT NULL,
             note_type VARCHAR(50),
             created_by INT,
@@ -171,8 +171,8 @@ class Activator {
         );
 
         CREATE TABLE IF NOT EXISTS agent_absences (
-            id SERIAL PRIMARY KEY,
-            agent_id INT NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+            absence_id SERIAL PRIMARY KEY,
+            agent_id INT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
             absence_date DATE NOT NULL,
             reason TEXT,
             created_by INT,
@@ -180,7 +180,7 @@ class Activator {
         );
 
         -- Create indexes
-        CREATE INDEX IF NOT EXISTS idx_agents_email ON agents(email);
+        CREATE INDEX IF NOT EXISTS idx_agents_email ON agents(email_address);
         CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
         CREATE INDEX IF NOT EXISTS idx_agents_created_at ON agents(created_at);
         CREATE INDEX IF NOT EXISTS idx_agent_meta_agent_id ON agent_meta(agent_id);
