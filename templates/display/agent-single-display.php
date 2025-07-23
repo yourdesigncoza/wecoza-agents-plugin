@@ -56,30 +56,18 @@ if (!defined('ABSPATH')) {
     <?php endif; ?>
     
     <?php if ($agent && !$error && !$loading) : ?>
-        
         <?php // Action Buttons ?>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="<?php echo esc_url($back_url); ?>" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-2"></i>
-                <?php esc_html_e('Back to Agents', 'wecoza-agents-plugin'); ?>
-            </a>
-            <?php if ($can_manage) : ?>
-            <div>
-                <button class="btn btn-phoenix-secondary px-3 px-sm-5 me-2">
-                    <i class="bi bi-pencil-square me-sm-2"></i>
-                    <span class="d-none d-sm-inline"><?php esc_html_e('Edit', 'wecoza-agents-plugin'); ?></span>
-                </button>
-                <button class="btn btn-phoenix-danger">
-                    <i class="bi bi-trash me-2"></i>
-                    <span><?php esc_html_e('Delete', 'wecoza-agents-plugin'); ?></span>
-                </button>
+        <div class="d-flex justify-content-end mb-4">
+            <div class="btn-group mt-2 me-2" role="group" aria-label="...">
+                <button class="btn btn-subtle-primary" type="button">Back To Agents</button>
+                <button class="btn btn-subtle-success" type="button">Edit</button>
+                <button class="btn btn-subtle-danger" type="button">Delete</button>
             </div>
-            <?php endif; ?>
         </div>
         
         <?php // Top Summary Cards ?>
         <div class="card mb-3">
-            <div class="card-body">
+            <div class="card-body ydcoza-mini-card-header">
                 <div class="row g-4 justify-content-between">
                     <!-- Name Card -->
                     <div class="col-sm-auto">
