@@ -122,11 +122,11 @@ class DatabaseService {
      */
     private function connect_postgresql() {
         // Get PostgreSQL credentials
-        $pg_host = get_option('wecoza_postgres_host');
-        $pg_port = get_option('wecoza_postgres_port', '5432');
-        $pg_dbname = get_option('wecoza_postgres_dbname');
-        $pg_user = get_option('wecoza_postgres_user');
-        $pg_pass = get_option('wecoza_postgres_password');
+        $pg_host = get_option('wecoza_postgres_host', '');
+        $pg_port = get_option('wecoza_postgres_port', '');
+        $pg_dbname = get_option('wecoza_postgres_dbname', '');
+        $pg_user = get_option('wecoza_postgres_user', '');
+        $pg_pass = get_option('wecoza_postgres_password', '');
 
         // Check if credentials exist
         if (empty($pg_host) || empty($pg_dbname) || empty($pg_user) || empty($pg_pass)) {

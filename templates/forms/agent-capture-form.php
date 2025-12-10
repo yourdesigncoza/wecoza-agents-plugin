@@ -570,7 +570,7 @@ use WeCoza\Agents\Helpers\FormHelpers;
     <!-- Submit Button -->
     <div class="row">
         <div class="col-md-12">
-            <button type="submit" class="btn btn-primary mt-3">
+            <button type="submit" class="btn btn-subtle-primary mt-3">
                 <?php echo $mode === 'edit' ? 'Update Agent' : 'Add New Agent'; ?>
             </button>
             <?php if (!empty($atts['redirect_after_save'])) : ?>

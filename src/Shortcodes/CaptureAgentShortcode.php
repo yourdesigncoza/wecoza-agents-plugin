@@ -650,20 +650,9 @@ class CaptureAgentShortcode extends AbstractShortcode {
      * @since 1.0.0
      * @return string|false Google Maps API key or false if not found
      */
-    private function get_google_maps_api_key() {
-        // First, try to get from environment variable (most secure)
-        $api_key = getenv('GOOGLE_MAPS_API_KEY');
-        if (!empty($api_key)) {
-            return $api_key;
-        }
-        
-        // Second, try to get from WordPress constant (defined in wp-config.php)
-        if (defined('GOOGLE_MAPS_API_KEY')) {
-            return GOOGLE_MAPS_API_KEY;
-        }
-        
+    private function get_google_maps_api_key() {       
         // Third, try to get from WordPress options (configurable in admin)
-        $api_key = get_option('wecoza_agents_google_maps_api_key');
+        $api_key = get_option('wecoza_google_maps_api_key');
         if (!empty($api_key)) {
             return $api_key;
         }
